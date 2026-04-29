@@ -4,55 +4,109 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Copenhagen Half Marathon Training Plan</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: system-ui, -apple-system, sans-serif; background: #ffffff; color: #111827; padding: 1.5rem; max-width: 900px; margin: 0 auto; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: #fff; color: #111827; padding: 1.5rem; max-width: 920px; margin: 0 auto; }
   .header-label { font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: #6b7280; margin-bottom: 6px; }
-  .header-title { font-size: 24px; font-weight: 600; margin-bottom: 4px; }
-  .header-sub { font-size: 14px; color: #6b7280; margin-bottom: 1.5rem; }
-  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.5rem; }
-  .card { background: #f9fafb; border-radius: 10px; padding: 14px 16px; }
+  .header-title  { font-size: 24px; font-weight: 600; margin-bottom: 4px; }
+  .header-sub    { font-size: 14px; color: #6b7280; margin-bottom: 1.5rem; }
+
+  /* Sync status */
+  #sync-status { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #6b7280; margin-bottom: 1.25rem; padding: 6px 12px; background: #f9fafb; border-radius: 20px; border: 1px solid #e5e7eb; }
+  #sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #d1d5db; flex-shrink: 0; transition: background .3s; }
+  #sync-dot.synced  { background: #16a34a; }
+  #sync-dot.syncing { background: #f59e0b; animation: pulse 1s infinite; }
+  #sync-dot.error   { background: #ef4444; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+  .cards { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 1.25rem; }
+  .card  { background: #f9fafb; border-radius: 10px; padding: 14px 16px; }
   .card-label { font-size: 12px; color: #6b7280; margin-bottom: 4px; }
   .card-value { font-size: 20px; font-weight: 600; }
-  .card-sub { font-size: 12px; color: #6b7280; margin-top: 2px; }
+  .card-sub   { font-size: 12px; color: #6b7280; margin-top: 2px; }
+
+  .global-progress { background: #f9fafb; border-radius: 12px; padding: 16px 18px; margin-bottom: 1.25rem; }
+  .gp-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .gp-title  { font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: #6b7280; }
+  .gp-score  { font-size: 13px; font-weight: 600; color: #111827; }
+  .bar-track { height: 10px; background: #e5e7eb; border-radius: 5px; position: relative; overflow: hidden; }
+  .bar-segment { height: 100%; position: absolute; top: 0; transition: width .4s ease; }
+  .gp-legend { display: flex; gap: 14px; margin-top: 8px; }
+  .gp-leg    { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #6b7280; }
+  .gp-dot    { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
   .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; }
-  .tab { padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 14px; border: 1.5px solid #e5e7eb; background: transparent; color: #6b7280; font-weight: 400; transition: all .15s; }
+  .tab  { padding: 10px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; border: 1.5px solid #e5e7eb; background: transparent; color: #6b7280; font-weight: 400; transition: all .15s; text-align: left; min-width: 130px; }
+  .tab-name { display: block; font-size: 13px; }
+  .tab-stat { display: block; font-size: 10px; margin-top: 3px; }
+  .tab-bar-track { height: 3px; background: #e5e7eb; border-radius: 2px; overflow: hidden; margin-top: 5px; position: relative; }
+  .tab-bar-done { height: 100%; position: absolute; top: 0; left: 0; border-radius: 2px; transition: width .4s; }
+  .tab-bar-skip { height: 100%; position: absolute; top: 0; border-radius: 2px; transition: width .4s; background: #fca5a5; }
   .tab.active-1 { border-color: #15803d; background: #f0fdf4; color: #15803d; font-weight: 500; }
   .tab.active-2 { border-color: #0369a1; background: #f0f9ff; color: #0369a1; font-weight: 500; }
   .tab.active-3 { border-color: #c2410c; background: #fff7ed; color: #c2410c; font-weight: 500; }
   .tab.active-4 { border-color: #7c3aed; background: #f5f3ff; color: #7c3aed; font-weight: 500; }
+
   .phase-banner { font-size: 13px; color: #6b7280; margin-bottom: 1rem; padding: 10px 14px; border-radius: 8px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
   .week { border: 0.5px solid #e5e7eb; border-radius: 12px; overflow: hidden; background: #fff; margin-bottom: 8px; }
-  .week-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; cursor: pointer; user-select: none; }
-  .week-num { font-weight: 500; font-size: 14px; min-width: 60px; }
+  .week.week-complete { border-color: #86efac; background: #f0fdf4; }
+  .week-header { display: flex; align-items: center; gap: 8px; padding: 12px 16px; cursor: pointer; user-select: none; }
+  .week-num   { font-weight: 500; font-size: 14px; min-width: 58px; }
   .week-dates { font-size: 13px; color: #6b7280; flex: 1; }
-  .week-mi { font-size: 13px; font-weight: 500; padding: 3px 10px; border-radius: 6px; background: #f9fafb; flex-shrink: 0; }
-  .week-bar-wrap { width: 64px; height: 5px; background: #f3f4f6; border-radius: 3px; overflow: hidden; flex-shrink: 0; }
-  .week-bar { height: 100%; border-radius: 3px; }
-  .chevron { font-size: 11px; color: #9ca3af; width: 12px; text-align: center; }
-  .tag { font-size: 11px; padding: 2px 8px; border-radius: 6px; font-weight: 500; flex-shrink: 0; margin-left: 2px; }
+  .week-mi    { font-size: 13px; font-weight: 500; padding: 3px 10px; border-radius: 6px; background: #f9fafb; flex-shrink: 0; }
+  .week-bar-wrap { width: 56px; height: 5px; background: #f3f4f6; border-radius: 3px; overflow: hidden; flex-shrink: 0; }
+  .week-bar  { height: 100%; border-radius: 3px; }
+  .chevron   { font-size: 11px; color: #9ca3af; width: 12px; text-align: center; flex-shrink: 0; }
+
+  .tag { font-size: 11px; padding: 2px 7px; border-radius: 6px; font-weight: 500; flex-shrink: 0; }
   .tag-recovery { background: #f5f3ff; color: #6d28d9; }
-  .tag-vacation { background: #f0f9ff; color: #0369a1; }
-  .tag-adjusted { background: #fefce8; color: #a16207; }
-  .days-wrap { border-top: 0.5px solid #e5e7eb; padding: 8px 16px 12px; display: none; }
-  .day-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 0.5px solid #f3f4f6; }
+  .tag-vacation  { background: #f0f9ff; color: #0369a1; }
+  .tag-adjusted  { background: #fefce8; color: #a16207; }
+  .tag-progress  { font-size: 11px; padding: 2px 7px; border-radius: 6px; font-weight: 500; flex-shrink: 0; }
+
+  .days-wrap { border-top: 0.5px solid #e5e7eb; padding: 8px 16px 12px; }
+  .day-row   { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 0.5px solid #f3f4f6; }
   .day-row:last-child { border-bottom: none; }
-  .day-name { width: 30px; font-size: 12px; font-weight: 500; color: #6b7280; flex-shrink: 0; }
-  .day-badge { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 6px; min-width: 72px; display: inline-block; text-align: center; flex-shrink: 0; }
-  .day-desc { font-size: 13px; flex: 1; }
-  .day-note { font-size: 12px; color: #6b7280; text-align: right; max-width: 240px; flex-shrink: 0; }
-  .pace-guide { margin-top: 1.5rem; padding: 14px 16px; background: #f9fafb; border-radius: 10px; }
+  .day-row.done    .day-desc { text-decoration: line-through; color: #9ca3af; }
+  .day-row.skipped .day-desc { text-decoration: line-through; color: #ef4444; }
+  .day-name  { width: 28px; font-size: 12px; font-weight: 500; color: #6b7280; flex-shrink: 0; }
+  .day-badge { font-size: 11px; font-weight: 500; padding: 2px 7px; border-radius: 6px; min-width: 70px; display: inline-block; text-align: center; flex-shrink: 0; }
+  .day-desc  { font-size: 13px; flex: 1; }
+  .day-note  { font-size: 11px; color: #9ca3af; text-align: right; max-width: 190px; flex-shrink: 0; }
+
+  .day-actions { display: flex; gap: 4px; flex-shrink: 0; margin-left: 4px; }
+  .btn-act { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid #e5e7eb; background: #fff; cursor: pointer; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; transition: all .12s; flex-shrink: 0; line-height: 1; }
+  .btn-act:hover { transform: scale(1.1); }
+  .btn-done-btn:hover { border-color: #16a34a; background: #dcfce7; color: #15803d; }
+  .btn-done-btn.on    { border-color: #16a34a; background: #16a34a; color: #fff; }
+  .btn-skip-btn:hover { border-color: #ef4444; background: #fef2f2; color: #ef4444; }
+  .btn-skip-btn.on    { border-color: #ef4444; background: #ef4444; color: #fff; }
+
+  .pace-guide       { margin-top: 1.5rem; padding: 14px 16px; background: #f9fafb; border-radius: 10px; }
   .pace-guide-label { font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: #6b7280; margin-bottom: 10px; }
   .pace-items { display: flex; flex-wrap: wrap; gap: 12px; }
-  .pace-item { display: flex; align-items: center; gap: 6px; font-size: 12px; }
-  .pace-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; display: inline-block; }
-  @media (max-width: 600px) { .cards { grid-template-columns: repeat(2,1fr); } }
+  .pace-item  { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+  .pace-dot   { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+  @media (max-width: 620px) {
+    .cards { grid-template-columns: repeat(2,1fr); }
+    .day-note { display: none; }
+    .tab { min-width: 0; }
+  }
 </style>
 </head>
 <body>
+
 <div class="header-label">Copenhagen Half Marathon · Training Plan</div>
 <div class="header-title">Sep 20, 2026</div>
 <div class="header-sub">21 weeks · 15–42 mi/week · Target: sub-1:33:00 · Starting Apr 28, 2026</div>
+
+<div id="sync-status">
+  <span id="sync-dot"></span>
+  <span id="sync-text">Connecting…</span>
+</div>
 
 <div class="cards">
   <div class="card"><div class="card-label">Duration</div><div class="card-value">21 weeks</div><div class="card-sub">Apr 28 → Sep 20</div></div>
@@ -61,15 +115,25 @@
   <div class="card"><div class="card-label">Peak long run</div><div class="card-value">16 mi</div><div class="card-sub">Week 17 · Aug 22</div></div>
 </div>
 
-<div class="tabs">
-  <button class="tab active-1" onclick="setPhase(1)">Transition <span style="font-size:12px;opacity:.75">Wks 1–2</span></button>
-  <button class="tab" onclick="setPhase(2)">Vacation <span style="font-size:12px;opacity:.75">Wks 3–6</span></button>
-  <button class="tab" onclick="setPhase(3)">Build <span style="font-size:12px;opacity:.75">Wks 7–15</span></button>
-  <button class="tab" onclick="setPhase(4)">Taper <span style="font-size:12px;opacity:.75">Wks 16–21</span></button>
+<div class="global-progress">
+  <div class="gp-header">
+    <span class="gp-title">Overall plan progress</span>
+    <span class="gp-score" id="global-score">—</span>
+  </div>
+  <div class="bar-track">
+    <div class="bar-segment" id="gb-done" style="left:0;background:#16a34a;width:0%"></div>
+    <div class="bar-segment" id="gb-skip" style="background:#fca5a5;width:0%"></div>
+  </div>
+  <div class="gp-legend">
+    <span class="gp-leg"><span class="gp-dot" style="background:#16a34a"></span>Completed</span>
+    <span class="gp-leg"><span class="gp-dot" style="background:#fca5a5"></span>Skipped</span>
+    <span class="gp-leg"><span class="gp-dot" style="background:#e5e7eb"></span>Remaining</span>
+  </div>
 </div>
 
-<div class="phase-banner" id="phase-banner"></div>
-<div id="weeks-container"></div>
+<div class="tabs" id="tabs-el"></div>
+<div class="phase-banner" id="banner-el"></div>
+<div id="weeks-el"></div>
 
 <div class="pace-guide">
   <div class="pace-guide-label">Pace guide</div>
@@ -85,7 +149,55 @@
 </div>
 
 <script>
-const TC = {
+// ── Supabase ──────────────────────────────────────────────────────────────────
+const SUPA_URL  = 'https://bdjuazaxwdhcjmcnthll.supabase.co';
+const SUPA_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkanVhemF4d2RoY2ptY250aGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0ODkzMzQsImV4cCI6MjA5MzA2NTMzNH0.5Jyy4Fskd9_pdrGgNthz_-AQhcY3wITaq_GdrkKTV2I';
+const ROW_ID    = 'main';
+const TABLE     = 'training_progress';
+
+const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+function setSyncStatus(status, text) {
+  const dot  = document.getElementById('sync-dot');
+  const label = document.getElementById('sync-text');
+  dot.className = status;   // 'syncing' | 'synced' | 'error'
+  label.textContent = text;
+}
+
+// Debounced save
+let saveTimer = null;
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(pushState, 800);
+}
+
+async function pushState() {
+  setSyncStatus('syncing', 'Saving…');
+  const { error } = await supa.from(TABLE).upsert({ id: ROW_ID, state: S, updated_at: new Date().toISOString() });
+  if (error) {
+    setSyncStatus('error', 'Save failed — check connection');
+    console.error(error);
+  } else {
+    setSyncStatus('synced', 'Saved · ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}));
+  }
+}
+
+async function pullState() {
+  setSyncStatus('syncing', 'Loading…');
+  const { data, error } = await supa.from(TABLE).select('state').eq('id', ROW_ID).single();
+  if (error && error.code !== 'PGRST116') {   // PGRST116 = no rows, that's fine
+    setSyncStatus('error', 'Could not load — using local cache');
+    console.error(error);
+    try { S = JSON.parse(localStorage.getItem('cph2026v1')) || {}; } catch { S = {}; }
+  } else {
+    S = (data && data.state) ? data.state : {};
+    setSyncStatus('synced', 'Synced · ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}));
+  }
+  render();
+}
+
+// ── Plan data ─────────────────────────────────────────────────────────────────
+const TC={
   rest:     {bg:"#f9fafb",bd:"#e5e7eb",cl:"#9ca3af",lb:"Rest"},
   easy:     {bg:"#f0fdf4",bd:"#86efac",cl:"#15803d",lb:"Easy"},
   long:     {bg:"#eff6ff",bd:"#93c5fd",cl:"#1d4ed8",lb:"Long run"},
@@ -97,105 +209,200 @@ const TC = {
   norun:    {bg:"#f9fafb",bd:"#d1d5db",cl:"#9ca3af",lb:"No run"},
   race:     {bg:"#fdf4ff",bd:"#e879f9",cl:"#86198f",lb:"Race day"},
 };
-const PHASES = [
-  {id:1,name:"Transition",sub:"Wks 1-2",dates:"Apr 28 - May 11",desc:"Maintain current fitness. Brand pacing events count as speed sessions.",color:"#15803d",bg:"#f0fdf4"},
-  {id:2,name:"Vacation",  sub:"Wks 3-6",dates:"May 12 - Jun 1", desc:"Reduced volume. Long run moved to Fri May 23. No running May 24-27.",color:"#0369a1",bg:"#f0f9ff"},
-  {id:3,name:"Build",     sub:"Wks 7-15",dates:"Jun 2 - Aug 9",  desc:"Progressive ramp to 40 mi/week. Tempo + interval quality sessions.",color:"#c2410c",bg:"#fff7ed"},
-  {id:4,name:"Taper",     sub:"Wks 16-21",dates:"Aug 10 - Sep 20",desc:"Volume drops steadily. Stay sharp. Arrive in Copenhagen fresh.",color:"#7c3aed",bg:"#f5f3ff"},
+const PHASES=[
+  {id:1,name:"Transition",sub:"Wks 1–2",  dates:"Apr 28 – May 11",desc:"Maintain current fitness. Brand pacing events count as speed sessions.",color:"#15803d",bg:"#f0fdf4"},
+  {id:2,name:"Vacation",  sub:"Wks 3–6",  dates:"May 12 – Jun 1", desc:"Reduced volume. Long run moved to Fri May 23. No running May 24–27.",color:"#0369a1",bg:"#f0f9ff"},
+  {id:3,name:"Build",     sub:"Wks 7–15", dates:"Jun 2 – Aug 9",  desc:"Progressive ramp to 40 mi/week. Tempo + interval quality sessions.",color:"#c2410c",bg:"#fff7ed"},
+  {id:4,name:"Taper",     sub:"Wks 16–21",dates:"Aug 10 – Sep 20",desc:"Volume drops steadily. Stay sharp. Arrive in Copenhagen fresh.",color:"#7c3aed",bg:"#f5f3ff"},
 ];
-const PG = {easy:"8:45-9:15 /mi",long:"8:00-8:30 /mi",tempo:"6:40-6:50 /mi",intervals:"5:50-6:05 /mi",hm:"7:05-7:10 /mi",strides:"6:10-6:25 /mi"};
+const PG={easy:"8:45–9:15 /mi",long:"8:00–8:30 /mi",tempo:"6:40–6:50 /mi",intervals:"5:50–6:05 /mi",hm:"7:05–7:10 /mi",strides:"6:10–6:25 /mi"};
 const mk=(w,ph,s,e,mi,cb,tag,days)=>({w,ph,s,e,mi,cb,tag,days});
-const d=(day,type,mi,desc,note)=>({day,type,mi,desc:desc,note:note||""});
-const r=day=>d(day,"rest",0,"Rest","");
-const nr=day=>d(day,"norun",0,"No run","Vacation blackout");
+const dw=(day,type,mi,desc,note)=>({day,type,mi,desc,note:note||""});
+const rest=day=>dw(day,"rest",0,"Rest","");
+const norun=day=>dw(day,"norun",0,"No run","Vacation blackout");
 const WEEKS=[
-  mk(1,1,"Apr 28","May 4",24,false,"",[r("Mon"),d("Tue","easy",4,"4 mi easy",PG.easy),d("Wed","brand",5,"Brand pacing event","Speed workout ~ 5 mi total"),d("Thu","easy",4,"4 mi easy",PG.easy),r("Fri"),d("Sat","long",11,"11 mi long run",PG.long),r("Sun")]),
-  mk(2,1,"May 5","May 11",25,false,"",[r("Mon"),d("Tue","easy",4,"4 mi easy",PG.easy),d("Wed","brand",5,"Brand pacing event","Speed workout ~ 5 mi total"),d("Thu","easy",4,"4 mi easy",PG.easy),r("Fri"),d("Sat","long",12,"12 mi long run",PG.long),r("Sun")]),
-  mk(3,2,"May 12","May 18",20,false,"vacation",[d("Mon","easy",4,"4 mi easy",PG.easy),d("Tue","easy",3,"3 mi easy - vacation",PG.easy),d("Wed","easy",3,"3 mi easy - vacation",PG.easy),r("Thu"),r("Fri"),d("Sat","long",10,"10 mi long run",PG.long),r("Sun")]),
-  mk(4,2,"May 19","May 25",22,false,"vacation-adjusted",[d("Mon","easy",3,"3 mi easy",PG.easy),d("Tue","intervals",5,"5 mi w/ 4x800m","800m @ 5:55 /mi - 400m jog recovery"),d("Wed","easy",3,"3 mi easy",PG.easy),d("Thu","easy",2,"2 mi easy",PG.easy),d("Fri","long",9,"9 mi long run - MOVED FROM SAT","Long run on Fri: Sat is no-run. "+PG.long),nr("Sat"),nr("Sun")]),
-  mk(5,2,"May 26","Jun 1",15,false,"adjusted",[nr("Mon"),nr("Tue"),d("Wed","easy",3,"3 mi easy - back to running",PG.easy),d("Thu","easy",4,"4 mi easy",PG.easy),r("Fri"),d("Sat","long",8,"8 mi long run - shorter after gap",PG.long),r("Sun")]),
-  mk(6,3,"Jun 2","Jun 8",26,false,"",[r("Mon"),d("Tue","intervals",6,"6 mi w/ 4x800m","800m @ 5:55 /mi - 400m jog recovery"),d("Wed","easy",4,"4 mi easy",PG.easy),d("Thu","easy",4,"4 mi easy",PG.easy),r("Fri"),d("Sat","long",12,"12 mi long run",PG.long),r("Sun")]),
-  mk(7,3,"Jun 9","Jun 15",29,false,"",[r("Mon"),d("Tue","intervals",7,"7 mi w/ 6x800m","800m @ 5:55 /mi - 400m jog recovery"),d("Wed","easy",5,"5 mi easy",PG.easy),d("Thu","tempo",6,"6 mi w/ 3 mi tempo","1.5mi WU - 3mi @ 6:45 /mi - 1.5mi CD"),r("Fri"),d("Sat","long",13,"13 mi long run",PG.long),r("Sun")]),
-  mk(8,3,"Jun 16","Jun 22",31,false,"",[r("Mon"),d("Tue","intervals",7,"7 mi w/ 6x800m","800m @ 5:50 /mi - 400m jog recovery"),d("Wed","easy",5,"5 mi easy",PG.easy),d("Thu","tempo",7,"7 mi w/ 3 mi tempo","1.5mi WU - 3mi @ 6:42 /mi - 1.5mi CD"),r("Fri"),d("Sat","long",13,"13 mi long run",PG.long),d("Sun","easy",2,"2 mi shakeout",PG.easy)]),
-  mk(9,3,"Jun 23","Jun 29",25,true,"",[r("Mon"),d("Tue","intervals",6,"6 mi w/ 4x800m","Recovery week - 800m @ 5:58 /mi"),d("Wed","easy",4,"4 mi easy",PG.easy),d("Thu","easy",4,"4 mi easy",PG.easy),r("Fri"),d("Sat","long",11,"11 mi long run",PG.long),r("Sun")]),
-  mk(10,3,"Jun 30","Jul 6",33,false,"",[r("Mon"),d("Tue","intervals",7,"7 mi w/ 6x800m","800m @ 5:50 /mi"),d("Wed","easy",5,"5 mi easy",PG.easy),d("Thu","tempo",7,"7 mi w/ 4 mi tempo","1.5mi WU - 4mi @ 6:42 /mi - 1.5mi CD"),r("Fri"),d("Sat","long",14,"14 mi long run",PG.long),r("Sun")]),
-  mk(11,3,"Jul 7","Jul 13",35,false,"",[d("Mon","easy",3,"3 mi easy",PG.easy),d("Tue","intervals",7,"7 mi w/ 8x800m","800m @ 5:50 /mi"),d("Wed","easy",5,"5 mi easy",PG.easy),d("Thu","tempo",7,"7 mi w/ 4 mi tempo","1.5mi WU - 4mi @ 6:40 /mi - 1.5mi CD"),r("Fri"),d("Sat","long",13,"13 mi long run",PG.long),r("Sun")]),
-  mk(12,3,"Jul 14","Jul 20",27,true,"",[r("Mon"),d("Tue","intervals",6,"6 mi w/ 4x800m","Recovery week - 800m @ 5:55 /mi"),d("Wed","easy",4,"4 mi easy",PG.easy),d("Thu","easy",4,"4 mi easy",PG.easy),r("Fri"),d("Sat","long",12,"12 mi long run",PG.long),d("Sun","easy",2,"2 mi shakeout",PG.easy)]),
-  mk(13,3,"Jul 21","Jul 27",38,false,"",[d("Mon","easy",3,"3 mi easy",PG.easy),d("Tue","intervals",8,"8 mi w/ 8x800m","800m @ 5:48 /mi"),d("Wed","easy",6,"6 mi easy",PG.easy),d("Thu","tempo",8,"8 mi w/ 5 mi tempo","1.5mi WU - 5mi @ 6:40 /mi - 1.5mi CD"),r("Fri"),d("Sat","long",15,"15 mi long run",PG.long),r("Sun")]),
-  mk(14,3,"Jul 28","Aug 3",40,false,"",[d("Mon","easy",3,"3 mi easy",PG.easy),d("Tue","intervals",8,"8 mi w/ 8x800m","800m @ 5:45 /mi"),d("Wed","easy",6,"6 mi easy",PG.easy),d("Thu","tempo",8,"8 mi w/ 5 mi tempo","1.5mi WU - 5mi @ 6:38 /mi - 1.5mi CD"),r("Fri"),d("Sat","long",15,"15 mi long run",PG.long),r("Sun")]),
-  mk(15,3,"Aug 4","Aug 9",31,true,"",[r("Mon"),d("Tue","intervals",6,"6 mi w/ 4x800m","Recovery week - 800m @ 5:52 /mi"),d("Wed","easy",5,"5 mi easy",PG.easy),d("Thu","tempo",6,"6 mi w/ 3 mi tempo","1.5mi WU - 3mi @ 6:42 /mi - 1.5mi CD"),r("Fri"),d("Sat","long",12,"12 mi long run",PG.long),r("Sun")]),
-  mk(16,4,"Aug 10","Aug 16",40,false,"",[d("Mon","easy",3,"3 mi easy",PG.easy),d("Tue","intervals",8,"8 mi w/ 8x800m","800m @ 5:45 /mi - peak intensity starts"),d("Wed","easy",6,"6 mi easy",PG.easy),d("Thu","hm",8,"8 mi w/ 4 mi @ HM pace","2mi WU - 4mi @ 7:07 /mi - 2mi CD"),r("Fri"),d("Sat","long",15,"15 mi long run",PG.long),r("Sun")]),
-  mk(17,4,"Aug 17","Aug 23",42,false,"",[d("Mon","easy",3,"3 mi easy",PG.easy),d("Tue","intervals",9,"9 mi w/ 10x800m","800m @ 5:45 /mi"),d("Wed","easy",7,"7 mi easy",PG.easy),d("Thu","hm",9,"9 mi w/ 5 mi @ HM pace","2mi WU - 5mi @ 7:07 /mi - 2mi CD"),r("Fri"),d("Sat","long",16,"16 mi long run - peak long run",PG.long),r("Sun")]),
-  mk(18,4,"Aug 24","Aug 30",33,false,"",[r("Mon"),d("Tue","intervals",7,"7 mi w/ 6x800m","Taper begins - 800m @ 5:48 /mi"),d("Wed","easy",5,"5 mi easy",PG.easy),d("Thu","tempo",7,"7 mi w/ 3 mi tempo","1.5mi WU - 3mi @ 6:42 /mi - 1.5mi CD"),r("Fri"),d("Sat","long",12,"12 mi easy long",PG.long),d("Sun","easy",2,"2 mi shakeout",PG.easy)]),
-  mk(19,4,"Aug 31","Sep 6",26,false,"",[r("Mon"),d("Tue","hm",6,"6 mi w/ 3 mi @ HM pace","1.5mi WU - 3mi @ 7:07 /mi - 1.5mi CD"),d("Wed","easy",5,"5 mi easy",PG.easy),d("Thu","easy",4,"4 mi easy",PG.easy),r("Fri"),d("Sat","long",10,"10 mi easy - last real long run",PG.long),d("Sun","easy",1,"1 mi shakeout",PG.easy)]),
-  mk(20,4,"Sep 7","Sep 13",20,false,"",[r("Mon"),d("Tue","strides",5,"5 mi w/ 6 strides","5 mi easy + 6x20-sec strides at 5K effort"),d("Wed","easy",4,"4 mi easy",PG.easy),d("Thu","easy",4,"4 mi easy",PG.easy),r("Fri"),d("Sat","long",7,"7 mi easy - fresh legs, no heroics",PG.easy),r("Sun")]),
-  mk(21,4,"Sep 14","Sep 20",22,false,"",[d("Mon","easy",3,"3 mi easy",PG.easy),d("Tue","easy",3,"3 mi easy",PG.easy),d("Wed","strides",3,"3 mi w/ 4 strides","Easy + 4x15-sec strides to wake up legs"),r("Thu"),r("Fri"),r("Sat"),d("Sun","race",13.1,"RACE - Copenhagen Half Marathon","Target: 7:07 /mi - Goal: sub-1:33:00")]),
+  mk(1,1,"Apr 28","May 4",24,false,"",[rest("Mon"),dw("Tue","easy",4,"4 mi easy",PG.easy),dw("Wed","brand",5,"Brand pacing event","Speed workout ~ 5 mi total"),dw("Thu","easy",4,"4 mi easy",PG.easy),rest("Fri"),dw("Sat","long",11,"11 mi long run",PG.long),rest("Sun")]),
+  mk(2,1,"May 5","May 11",25,false,"",[rest("Mon"),dw("Tue","easy",4,"4 mi easy",PG.easy),dw("Wed","brand",5,"Brand pacing event","Speed workout ~ 5 mi total"),dw("Thu","easy",4,"4 mi easy",PG.easy),rest("Fri"),dw("Sat","long",12,"12 mi long run",PG.long),rest("Sun")]),
+  mk(3,2,"May 12","May 18",20,false,"vacation",[dw("Mon","easy",4,"4 mi easy",PG.easy),dw("Tue","easy",3,"3 mi easy – vacation",PG.easy),dw("Wed","easy",3,"3 mi easy – vacation",PG.easy),rest("Thu"),rest("Fri"),dw("Sat","long",10,"10 mi long run",PG.long),rest("Sun")]),
+  mk(4,2,"May 19","May 25",22,false,"vacation-adjusted",[dw("Mon","easy",3,"3 mi easy",PG.easy),dw("Tue","intervals",5,"5 mi w/ 4×800m","800m @ 5:55 /mi · 400m jog recovery"),dw("Wed","easy",3,"3 mi easy",PG.easy),dw("Thu","easy",2,"2 mi easy",PG.easy),dw("Fri","long",9,"9 mi long run – MOVED FROM SAT","Long run on Fri · Sat is no-run · "+PG.long),norun("Sat"),norun("Sun")]),
+  mk(5,2,"May 26","Jun 1",15,false,"adjusted",[norun("Mon"),norun("Tue"),dw("Wed","easy",3,"3 mi easy – back to running",PG.easy),dw("Thu","easy",4,"4 mi easy",PG.easy),rest("Fri"),dw("Sat","long",8,"8 mi long run – shorter after gap",PG.long),rest("Sun")]),
+  mk(6,3,"Jun 2","Jun 8",26,false,"",[rest("Mon"),dw("Tue","intervals",6,"6 mi w/ 4×800m","800m @ 5:55 /mi · 400m jog recovery"),dw("Wed","easy",4,"4 mi easy",PG.easy),dw("Thu","easy",4,"4 mi easy",PG.easy),rest("Fri"),dw("Sat","long",12,"12 mi long run",PG.long),rest("Sun")]),
+  mk(7,3,"Jun 9","Jun 15",29,false,"",[rest("Mon"),dw("Tue","intervals",7,"7 mi w/ 6×800m","800m @ 5:55 /mi · 400m jog recovery"),dw("Wed","easy",5,"5 mi easy",PG.easy),dw("Thu","tempo",6,"6 mi w/ 3 mi tempo","1.5mi WU · 3mi @ 6:45 /mi · 1.5mi CD"),rest("Fri"),dw("Sat","long",13,"13 mi long run",PG.long),rest("Sun")]),
+  mk(8,3,"Jun 16","Jun 22",31,false,"",[rest("Mon"),dw("Tue","intervals",7,"7 mi w/ 6×800m","800m @ 5:50 /mi · 400m jog recovery"),dw("Wed","easy",5,"5 mi easy",PG.easy),dw("Thu","tempo",7,"7 mi w/ 3 mi tempo","1.5mi WU · 3mi @ 6:42 /mi · 1.5mi CD"),rest("Fri"),dw("Sat","long",13,"13 mi long run",PG.long),dw("Sun","easy",2,"2 mi shakeout",PG.easy)]),
+  mk(9,3,"Jun 23","Jun 29",25,true,"",[rest("Mon"),dw("Tue","intervals",6,"6 mi w/ 4×800m","Recovery week · 800m @ 5:58 /mi"),dw("Wed","easy",4,"4 mi easy",PG.easy),dw("Thu","easy",4,"4 mi easy",PG.easy),rest("Fri"),dw("Sat","long",11,"11 mi long run",PG.long),rest("Sun")]),
+  mk(10,3,"Jun 30","Jul 6",33,false,"",[rest("Mon"),dw("Tue","intervals",7,"7 mi w/ 6×800m","800m @ 5:50 /mi"),dw("Wed","easy",5,"5 mi easy",PG.easy),dw("Thu","tempo",7,"7 mi w/ 4 mi tempo","1.5mi WU · 4mi @ 6:42 /mi · 1.5mi CD"),rest("Fri"),dw("Sat","long",14,"14 mi long run",PG.long),rest("Sun")]),
+  mk(11,3,"Jul 7","Jul 13",35,false,"",[dw("Mon","easy",3,"3 mi easy",PG.easy),dw("Tue","intervals",7,"7 mi w/ 8×800m","800m @ 5:50 /mi"),dw("Wed","easy",5,"5 mi easy",PG.easy),dw("Thu","tempo",7,"7 mi w/ 4 mi tempo","1.5mi WU · 4mi @ 6:40 /mi · 1.5mi CD"),rest("Fri"),dw("Sat","long",13,"13 mi long run",PG.long),rest("Sun")]),
+  mk(12,3,"Jul 14","Jul 20",27,true,"",[rest("Mon"),dw("Tue","intervals",6,"6 mi w/ 4×800m","Recovery week · 800m @ 5:55 /mi"),dw("Wed","easy",4,"4 mi easy",PG.easy),dw("Thu","easy",4,"4 mi easy",PG.easy),rest("Fri"),dw("Sat","long",12,"12 mi long run",PG.long),dw("Sun","easy",2,"2 mi shakeout",PG.easy)]),
+  mk(13,3,"Jul 21","Jul 27",38,false,"",[dw("Mon","easy",3,"3 mi easy",PG.easy),dw("Tue","intervals",8,"8 mi w/ 8×800m","800m @ 5:48 /mi"),dw("Wed","easy",6,"6 mi easy",PG.easy),dw("Thu","tempo",8,"8 mi w/ 5 mi tempo","1.5mi WU · 5mi @ 6:40 /mi · 1.5mi CD"),rest("Fri"),dw("Sat","long",15,"15 mi long run",PG.long),rest("Sun")]),
+  mk(14,3,"Jul 28","Aug 3",40,false,"",[dw("Mon","easy",3,"3 mi easy",PG.easy),dw("Tue","intervals",8,"8 mi w/ 8×800m","800m @ 5:45 /mi"),dw("Wed","easy",6,"6 mi easy",PG.easy),dw("Thu","tempo",8,"8 mi w/ 5 mi tempo","1.5mi WU · 5mi @ 6:38 /mi · 1.5mi CD"),rest("Fri"),dw("Sat","long",15,"15 mi long run",PG.long),rest("Sun")]),
+  mk(15,3,"Aug 4","Aug 9",31,true,"",[rest("Mon"),dw("Tue","intervals",6,"6 mi w/ 4×800m","Recovery week · 800m @ 5:52 /mi"),dw("Wed","easy",5,"5 mi easy",PG.easy),dw("Thu","tempo",6,"6 mi w/ 3 mi tempo","1.5mi WU · 3mi @ 6:42 /mi · 1.5mi CD"),rest("Fri"),dw("Sat","long",12,"12 mi long run",PG.long),rest("Sun")]),
+  mk(16,4,"Aug 10","Aug 16",40,false,"",[dw("Mon","easy",3,"3 mi easy",PG.easy),dw("Tue","intervals",8,"8 mi w/ 8×800m","800m @ 5:45 /mi · peak intensity"),dw("Wed","easy",6,"6 mi easy",PG.easy),dw("Thu","hm",8,"8 mi w/ 4 mi @ HM pace","2mi WU · 4mi @ 7:07 /mi · 2mi CD"),rest("Fri"),dw("Sat","long",15,"15 mi long run",PG.long),rest("Sun")]),
+  mk(17,4,"Aug 17","Aug 23",42,false,"",[dw("Mon","easy",3,"3 mi easy",PG.easy),dw("Tue","intervals",9,"9 mi w/ 10×800m","800m @ 5:45 /mi"),dw("Wed","easy",7,"7 mi easy",PG.easy),dw("Thu","hm",9,"9 mi w/ 5 mi @ HM pace","2mi WU · 5mi @ 7:07 /mi · 2mi CD"),rest("Fri"),dw("Sat","long",16,"16 mi long run – peak",PG.long),rest("Sun")]),
+  mk(18,4,"Aug 24","Aug 30",33,false,"",[rest("Mon"),dw("Tue","intervals",7,"7 mi w/ 6×800m","Taper begins · 800m @ 5:48 /mi"),dw("Wed","easy",5,"5 mi easy",PG.easy),dw("Thu","tempo",7,"7 mi w/ 3 mi tempo","1.5mi WU · 3mi @ 6:42 /mi · 1.5mi CD"),rest("Fri"),dw("Sat","long",12,"12 mi easy long",PG.long),dw("Sun","easy",2,"2 mi shakeout",PG.easy)]),
+  mk(19,4,"Aug 31","Sep 6",26,false,"",[rest("Mon"),dw("Tue","hm",6,"6 mi w/ 3 mi @ HM pace","1.5mi WU · 3mi @ 7:07 /mi · 1.5mi CD"),dw("Wed","easy",5,"5 mi easy",PG.easy),dw("Thu","easy",4,"4 mi easy",PG.easy),rest("Fri"),dw("Sat","long",10,"10 mi easy – last real long run",PG.long),dw("Sun","easy",1,"1 mi shakeout",PG.easy)]),
+  mk(20,4,"Sep 7","Sep 13",20,false,"",[rest("Mon"),dw("Tue","strides",5,"5 mi w/ 6 strides","5 mi easy + 6×20-sec strides at 5K effort"),dw("Wed","easy",4,"4 mi easy",PG.easy),dw("Thu","easy",4,"4 mi easy",PG.easy),rest("Fri"),dw("Sat","long",7,"7 mi easy – fresh legs, no heroics",PG.easy),rest("Sun")]),
+  mk(21,4,"Sep 14","Sep 20",22,false,"",[dw("Mon","easy",3,"3 mi easy",PG.easy),dw("Tue","easy",3,"3 mi easy",PG.easy),dw("Wed","strides",3,"3 mi w/ 4 strides","Easy + 4×15-sec strides to wake up legs"),rest("Thu"),rest("Fri"),rest("Sat"),dw("Sun","race",13.1,"RACE – Copenhagen Half Marathon","Target: 7:07 /mi · Goal: sub-1:33:00")]),
 ];
 
-let activePh = 1;
-const expanded = new Set();
+// ── State ─────────────────────────────────────────────────────────────────────
+let S = {};
+const PASSIVE = new Set(['rest','norun']);
+const key = (wk, day) => 'w' + wk + '_' + day;
 
+// ── Counts ────────────────────────────────────────────────────────────────────
+function counts(weeks) {
+  let total=0, done=0, skipped=0;
+  weeks.forEach(w => w.days.forEach(d => {
+    if (PASSIVE.has(d.type)) return;
+    total++;
+    const v = S[key(w.w, d.day)];
+    if (v === 'done') done++;
+    if (v === 'skip') skipped++;
+  }));
+  return { total, done, skipped };
+}
+
+// ── UI state ──────────────────────────────────────────────────────────────────
+let activePhase = 1;
+const open = new Set();
+
+// ── Actions ───────────────────────────────────────────────────────────────────
+function toggleDone(wk, day, e) {
+  e.stopPropagation();
+  const k = key(wk, day);
+  S[k] = S[k] === 'done' ? undefined : 'done';
+  if (!S[k]) delete S[k];
+  // Mirror to localStorage as fallback
+  try { localStorage.setItem('cph2026v1', JSON.stringify(S)); } catch {}
+  scheduleSave();
+  render();
+}
+function toggleSkip(wk, day, e) {
+  e.stopPropagation();
+  const k = key(wk, day);
+  S[k] = S[k] === 'skip' ? undefined : 'skip';
+  if (!S[k]) delete S[k];
+  try { localStorage.setItem('cph2026v1', JSON.stringify(S)); } catch {}
+  scheduleSave();
+  render();
+}
+function toggleWeek(wk) { open.has(wk) ? open.delete(wk) : open.add(wk); render(); }
+function setPhase(p)    { activePhase = p; render(); }
+
+// ── Render ────────────────────────────────────────────────────────────────────
 function badge(type) {
   const t = TC[type];
   return '<span class="day-badge" style="background:'+t.bg+';color:'+t.cl+';border:0.5px solid '+t.bd+'">'+t.lb+'</span>';
 }
 
-function renderWeeks() {
-  const ph = PHASES.find(p => p.id === activePh);
-  const phWeeks = WEEKS.filter(w => w.ph === activePh);
-  const banner = document.getElementById('phase-banner');
-  banner.style.background = ph.bg;
-  banner.style.borderLeft = '3px solid ' + ph.color;
-  banner.innerHTML = '<span style="font-weight:500;color:'+ph.color+'">'+ph.name+'</span><span>·</span><span>'+ph.dates+'</span><span>·</span><span>'+ph.desc+'</span>';
+function render() {
+  const ph = PHASES.find(p => p.id === activePhase);
+  const allC = counts(WEEKS);
+  const donePct = allC.total ? Math.round(allC.done    / allC.total * 100) : 0;
+  const skipPct = allC.total ? Math.round(allC.skipped / allC.total * 100) : 0;
 
-  const container = document.getElementById('weeks-container');
-  container.innerHTML = '';
-  phWeeks.forEach(w => {
-    const isOpen = expanded.has(w.w);
-    const pct = Math.round((w.mi / 42) * 100);
-    const wDiv = document.createElement('div');
-    wDiv.className = 'week';
+  // Global bar
+  document.getElementById('global-score').textContent =
+    allC.done + ' completed · ' + allC.skipped + ' skipped · ' + (allC.total - allC.done - allC.skipped) + ' remaining';
+  document.getElementById('gb-done').style.width = donePct + '%';
+  document.getElementById('gb-skip').style.left  = donePct + '%';
+  document.getElementById('gb-skip').style.width  = skipPct + '%';
+
+  // Tabs
+  const tabsEl = document.getElementById('tabs-el');
+  tabsEl.innerHTML = '';
+  PHASES.forEach(p => {
+    const c  = counts(WEEKS.filter(w => w.ph === p.id));
+    const dp = c.total ? Math.round(c.done    / c.total * 100) : 0;
+    const sp = c.total ? Math.round(c.skipped / c.total * 100) : 0;
+    const active = activePhase === p.id;
+    const b = document.createElement('button');
+    b.className = 'tab' + (active ? ' active-' + p.id : '');
+    b.onclick = () => setPhase(p.id);
+    b.innerHTML =
+      '<span class="tab-name">' + p.name + ' <span style="font-size:11px;opacity:.7">' + p.sub + '</span></span>' +
+      '<span class="tab-stat" style="color:' + (active ? p.color : '#9ca3af') + '">' +
+        c.done + '/' + c.total + ' done' + (c.skipped ? ' · ' + c.skipped + ' skipped' : '') +
+      '</span>' +
+      '<div class="tab-bar-track">' +
+        '<div class="tab-bar-done" style="width:' + (dp + sp) + '%;background:' + (active ? p.color : '#d1d5db') + '"></div>' +
+        '<div class="tab-bar-skip" style="left:' + dp + '%;width:' + sp + '%"></div>' +
+      '</div>';
+    tabsEl.appendChild(b);
+  });
+
+  // Phase banner
+  const banner = document.getElementById('banner-el');
+  banner.style.background  = ph.bg;
+  banner.style.borderLeft  = '3px solid ' + ph.color;
+  banner.innerHTML =
+    '<span style="font-weight:500;color:' + ph.color + '">' + ph.name + '</span>' +
+    '<span>·</span><span>' + ph.dates + '</span><span>·</span><span>' + ph.desc + '</span>';
+
+  // Weeks
+  const weeksEl = document.getElementById('weeks-el');
+  weeksEl.innerHTML = '';
+  WEEKS.filter(w => w.ph === activePhase).forEach(w => {
+    const isOpen = open.has(w.w);
+    const pct  = Math.round(w.mi / 42 * 100);
+    const c    = counts([w]);
+    const allDone    = c.total > 0 && c.done === c.total;
+    const inProgress = (c.done + c.skipped) > 0 && !allDone;
+
+    let pillBg = '#f3f4f6', pillCl = '#6b7280', pillTx = c.total + ' workouts';
+    if (allDone)      { pillBg = '#dcfce7'; pillCl = '#15803d'; pillTx = '✓ Complete'; }
+    else if (inProgress) { pillBg = '#fef9c3'; pillCl = '#854d0e'; pillTx = c.done + '/' + c.total + ' done' + (c.skipped ? ' · ' + c.skipped + ' skipped' : ''); }
 
     let tags = '';
     if (w.cb) tags += '<span class="tag tag-recovery">Recovery</span>';
     if (w.tag && w.tag.includes('vacation')) tags += '<span class="tag tag-vacation">Vacation</span>';
     if (w.tag && w.tag.includes('adjusted')) tags += '<span class="tag tag-adjusted">Adjusted</span>';
+    tags += '<span class="tag-progress" style="background:' + pillBg + ';color:' + pillCl + '">' + pillTx + '</span>';
 
     let daysHtml = '';
     if (isOpen) {
-      w.days.forEach((day, i) => {
-        const isRest = day.type === 'rest';
-        const isNoRun = day.type === 'norun';
-        daysHtml += '<div class="day-row" style="opacity:' + (isRest ? 0.45 : 1) + '">' +
-          '<span class="day-name">' + day.day + '</span>' +
-          badge(day.type) +
-          '<span class="day-desc" style="color:' + (isRest || isNoRun ? '#9ca3af' : '#111827') + '">' + day.desc + '</span>' +
-          (day.note && !isRest && !isNoRun ? '<span class="day-note">' + day.note + '</span>' : '') +
+      w.days.forEach(d => {
+        const passive = PASSIVE.has(d.type);
+        const v       = S[key(w.w, d.day)];
+        const isDone  = v === 'done', isSkip = v === 'skip';
+        let rc = 'day-row';
+        if (isDone) rc += ' done';
+        if (isSkip) rc += ' skipped';
+        const actions = passive ? '' :
+          '<div class="day-actions">' +
+            '<button class="btn-act btn-done-btn' + (isDone ? ' on' : '') + '" onclick="toggleDone(' + w.w + ',\'' + d.day + '\',event)" title="Mark as done">✓</button>' +
+            '<button class="btn-act btn-skip-btn' + (isSkip ? ' on' : '') + '" onclick="toggleSkip(' + w.w + ',\'' + d.day + '\',event)" title="Skip">✕</button>' +
+          '</div>';
+        daysHtml +=
+          '<div class="' + rc + '" style="opacity:' + (passive ? 0.38 : 1) + '">' +
+            '<span class="day-name">' + d.day + '</span>' +
+            badge(d.type) +
+            '<span class="day-desc">' + d.desc + '</span>' +
+            (d.note && !passive ? '<span class="day-note">' + d.note + '</span>' : '') +
+            actions +
           '</div>';
       });
     }
 
-    wDiv.innerHTML = '<div class="week-header" onclick="toggleWeek(' + w.w + ')">' +
-      '<span class="week-num">Week ' + w.w + '</span>' +
-      '<span class="week-dates">' + w.s + ' - ' + w.e + '</span>' +
-      tags +
-      '<span class="week-mi">' + w.mi + ' mi</span>' +
-      '<div class="week-bar-wrap"><div class="week-bar" style="width:' + pct + '%;background:' + ph.color + '"></div></div>' +
-      '<span class="chevron">' + (isOpen ? '▲' : '▼') + '</span>' +
+    const div = document.createElement('div');
+    div.className = 'week' + (allDone ? ' week-complete' : '');
+    div.innerHTML =
+      '<div class="week-header" onclick="toggleWeek(' + w.w + ')">' +
+        '<span class="week-num">Week ' + w.w + '</span>' +
+        '<span class="week-dates">' + w.s + ' – ' + w.e + '</span>' +
+        tags +
+        '<span class="week-mi">' + w.mi + ' mi</span>' +
+        '<div class="week-bar-wrap"><div class="week-bar" style="width:' + pct + '%;background:' + ph.color + '"></div></div>' +
+        '<span class="chevron">' + (isOpen ? '▲' : '▼') + '</span>' +
       '</div>' +
-      (isOpen ? '<div class="days-wrap" style="display:block">' + daysHtml + '</div>' : '<div class="days-wrap"></div>');
-    container.appendChild(wDiv);
-  });
-
-  document.querySelectorAll('.tab').forEach((tab, i) => {
-    tab.className = 'tab' + (PHASES[i].id === activePh ? ' active-' + activePh : '');
+      (isOpen ? '<div class="days-wrap">' + daysHtml + '</div>' : '');
+    weeksEl.appendChild(div);
   });
 }
 
-function setPhase(p) { activePh = p; expanded.clear(); renderWeeks(); }
-function toggleWeek(w) { if (expanded.has(w)) expanded.delete(w); else expanded.add(w); renderWeeks(); }
-
-renderWeeks();
+// ── Boot ──────────────────────────────────────────────────────────────────────
+render(); // initial render with empty state while loading
+pullState();
 </script>
 </body>
 </html>
