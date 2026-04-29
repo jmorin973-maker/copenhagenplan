@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Copenhagen Half Marathon Training Plan</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: #ffffff; color: #111827; padding: 1.5rem; max-width: 900px; margin: 0 auto; }
+  .header-label { font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: #6b7280; margin-bottom: 6px; }
+  .header-title { font-size: 24px; font-weight: 600; margin-bottom: 4px; }
+  .header-sub { font-size: 14px; color: #6b7280; margin-bottom: 1.5rem; }
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+  .card { background: #f9fafb; border-radius: 10px; padding: 14px 16px; }
+  .card-label { font-size: 12px; color: #6b7280; margin-bottom: 4px; }
+  .card-value { font-size: 20px; font-weight: 600; }
+  .card-sub { font-size: 12px; color: #6b7280; margin-top: 2px; }
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; }
+  .tab { padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 14px; border: 1.5px solid #e5e7eb; background: transparent; color: #6b7280; font-weight: 400; transition: all .15s; }
+  .tab.active-1 { border-color: #15803d; background: #f0fdf4; color: #15803d; font-weight: 500; }
+  .tab.active-2 { border-color: #0369a1; background: #f0f9ff; color: #0369a1; font-weight: 500; }
+  .tab.active-3 { border-color: #c2410c; background: #fff7ed; color: #c2410c; font-weight: 500; }
+  .tab.active-4 { border-color: #7c3aed; background: #f5f3ff; color: #7c3aed; font-weight: 500; }
+  .phase-banner { font-size: 13px; color: #6b7280; margin-bottom: 1rem; padding: 10px 14px; border-radius: 8px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .week { border: 0.5px solid #e5e7eb; border-radius: 12px; overflow: hidden; background: #fff; margin-bottom: 8px; }
+  .week-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; cursor: pointer; user-select: none; }
+  .week-num { font-weight: 500; font-size: 14px; min-width: 60px; }
+  .week-dates { font-size: 13px; color: #6b7280; flex: 1; }
+  .week-mi { font-size: 13px; font-weight: 500; padding: 3px 10px; border-radius: 6px; background: #f9fafb; flex-shrink: 0; }
+  .week-bar-wrap { width: 64px; height: 5px; background: #f3f4f6; border-radius: 3px; overflow: hidden; flex-shrink: 0; }
+  .week-bar { height: 100%; border-radius: 3px; }
+  .chevron { font-size: 11px; color: #9ca3af; width: 12px; text-align: center; }
+  .tag { font-size: 11px; padding: 2px 8px; border-radius: 6px; font-weight: 500; flex-shrink: 0; margin-left: 2px; }
+  .tag-recovery { background: #f5f3ff; color: #6d28d9; }
+  .tag-vacation { background: #f0f9ff; color: #0369a1; }
+  .tag-adjusted { background: #fefce8; color: #a16207; }
+  .days-wrap { border-top: 0.5px solid #e5e7eb; padding: 8px 16px 12px; display: none; }
+  .day-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 0.5px solid #f3f4f6; }
+  .day-row:last-child { border-bottom: none; }
+  .day-name { width: 30px; font-size: 12px; font-weight: 500; color: #6b7280; flex-shrink: 0; }
+  .day-badge { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 6px; min-width: 72px; display: inline-block; text-align: center; flex-shrink: 0; }
+  .day-desc { font-size: 13px; flex: 1; }
+  .day-note { font-size: 12px; color: #6b7280; text-align: right; max-width: 240px; flex-shrink: 0; }
+  .pace-guide { margin-top: 1.5rem; padding: 14px 16px; background: #f9fafb; border-radius: 10px; }
+  .pace-guide-label { font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: #6b7280; margin-bottom: 10px; }
+  .pace-items { display: flex; flex-wrap: wrap; gap: 12px; }
+  .pace-item { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+  .pace-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; display: inline-block; }
+  @media (max-width: 600px) { .cards { grid-template-columns: repeat(2,1fr); } }
+</style>
+</head>
+<body>
+<div class="header-label">Copenhagen Half Marathon · Training Plan</div>
+<div class="header-title">Sep 20, 2026</div>
+<div class="header-sub">21 weeks · 15–42 mi/week · Target: sub-1:33:00 · Starting Apr 28, 2026</div>
+
+<div class="cards">
+  <div class="card"><div class="card-label">Duration</div><div class="card-value">21 weeks</div><div class="card-sub">Apr 28 → Sep 20</div></div>
+  <div class="card"><div class="card-label">Target</div><div class="card-value">sub-1:33</div><div class="card-sub">~7:07 /mi goal pace</div></div>
+  <div class="card"><div class="card-label">Peak week</div><div class="card-value">42 mi</div><div class="card-sub">Week 17 · Aug 17</div></div>
+  <div class="card"><div class="card-label">Peak long run</div><div class="card-value">16 mi</div><div class="card-sub">Week 17 · Aug 22</div></div>
+</div>
+
+<div class="tabs">
+  <button class="tab active-1" onclick="setPhase(1)">Transition <span style="font-size:12px;opacity:.75">Wks 1–2</span></button>
+  <button class="tab" onclick="setPhase(2)">Vacation <span style="font-size:12px;opacity:.75">Wks 3–6</span></button>
+  <button class="tab" onclick="setPhase(3)">Build <span style="font-size:12px;opacity:.75">Wks 7–15</span></button>
+  <button class="tab" onclick="setPhase(4)">Taper <span style="font-size:12px;opacity:.75">Wks 16–21</span></button>
+</div>
+
+<div class="phase-banner" id="phase-banner"></div>
+<div id="weeks-container"></div>
+
+<div class="pace-guide">
+  <div class="pace-guide-label">Pace guide</div>
+  <div class="pace-items">
+    <span class="pace-item"><span class="pace-dot" style="background:#f0fdf4;border:1px solid #86efac"></span><span style="color:#15803d;font-weight:500">Easy</span><span style="color:#6b7280">· 8:45–9:15 /mi</span></span>
+    <span class="pace-item"><span class="pace-dot" style="background:#eff6ff;border:1px solid #93c5fd"></span><span style="color:#1d4ed8;font-weight:500">Long run</span><span style="color:#6b7280">· 8:00–8:30 /mi</span></span>
+    <span class="pace-item"><span class="pace-dot" style="background:#fff7ed;border:1px solid #fdba74"></span><span style="color:#c2410c;font-weight:500">Tempo</span><span style="color:#6b7280">· 6:40–6:50 /mi</span></span>
+    <span class="pace-item"><span class="pace-dot" style="background:#fef2f2;border:1px solid #fca5a5"></span><span style="color:#b91c1c;font-weight:500">Intervals</span><span style="color:#6b7280">· 5:50–6:05 /mi</span></span>
+    <span class="pace-item"><span class="pace-dot" style="background:#fefce8;border:1px solid #fde047"></span><span style="color:#a16207;font-weight:500">HM pace</span><span style="color:#6b7280">· 7:05–7:10 /mi</span></span>
+    <span class="pace-item"><span class="pace-dot" style="background:#fff0f9;border:1px solid #f9a8d4"></span><span style="color:#be185d;font-weight:500">Brand event</span><span style="color:#6b7280">· speed session</span></span>
+    <span class="pace-item"><span class="pace-dot" style="background:#f5f3ff;border:1px solid #c4b5fd"></span><span style="color:#6d28d9;font-weight:500">Strides</span><span style="color:#6b7280">· 6:10–6:25 /mi</span></span>
+  </div>
+</div>
+
+<script>
+const TC = {
+  rest:     {bg:"#f9fafb",bd:"#e5e7eb",cl:"#9ca3af",lb:"Rest"},
+  easy:     {bg:"#f0fdf4",bd:"#86efac",cl:"#15803d",lb:"Easy"},
+  long:     {bg:"#eff6ff",bd:"#93c5fd",cl:"#1d4ed8",lb:"Long run"},
+  tempo:    {bg:"#fff7ed",bd:"#fdba74",cl:"#c2410c",lb:"Tempo"},
+  intervals:{bg:"#fef2f2",bd:"#fca5a5",cl:"#b91c1c",lb:"Intervals"},
+  hm:       {bg:"#fefce8",bd:"#fde047",cl:"#a16207",lb:"HM pace"},
+  strides:  {bg:"#f5f3ff",bd:"#c4b5fd",cl:"#6d28d9",lb:"Strides"},
+  brand:    {bg:"#fff0f9",bd:"#f9a8d4",cl:"#be185d",lb:"Brand event"},
+  norun:    {bg:"#f9fafb",bd:"#d1d5db",cl:"#9ca3af",lb:"No run"},
+  race:     {bg:"#fdf4ff",bd:"#e879f9",cl:"#86198f",lb:"Race day"},
+};
+const PHASES = [
+  {id:1,name:"Transition",sub:"Wks 1-2",dates:"Apr 28 - May 11",desc:"Maintain current fitness. Brand pacing events count as speed sessions.",color:"#15803d",bg:"#f0fdf4"},
+  {id:2,name:"Vacation",  sub:"Wks 3-6",dates:"May 12 - Jun 1", desc:"Reduced volume. Long run moved to Fri May 23. No running May 24-27.",color:"#0369a1",bg:"#f0f9ff"},
+  {id:3,name:"Build",     sub:"Wks 7-15",dates:"Jun 2 - Aug 9",  desc:"Progressive ramp to 40 mi/week. Tempo + interval quality sessions.",color:"#c2410c",bg:"#fff7ed"},
+  {id:4,name:"Taper",     sub:"Wks 16-21",dates:"Aug 10 - Sep 20",desc:"Volume drops steadily. Stay sharp. Arrive in Copenhagen fresh.",color:"#7c3aed",bg:"#f5f3ff"},
+];
+const PG = {easy:"8:45-9:15 /mi",long:"8:00-8:30 /mi",tempo:"6:40-6:50 /mi",intervals:"5:50-6:05 /mi",hm:"7:05-7:10 /mi",strides:"6:10-6:25 /mi"};
+const mk=(w,ph,s,e,mi,cb,tag,days)=>({w,ph,s,e,mi,cb,tag,days});
+const d=(day,type,mi,desc,note)=>({day,type,mi,desc:desc,note:note||""});
+const r=day=>d(day,"rest",0,"Rest","");
+const nr=day=>d(day,"norun",0,"No run","Vacation blackout");
+const WEEKS=[
+  mk(1,1,"Apr 28","May 4",24,false,"",[r("Mon"),d("Tue","easy",4,"4 mi easy",PG.easy),d("Wed","brand",5,"Brand pacing event","Speed workout ~ 5 mi total"),d("Thu","easy",4,"4 mi easy",PG.easy),r("Fri"),d("Sat","long",11,"11 mi long run",PG.long),r("Sun")]),
+  mk(2,1,"May 5","May 11",25,false,"",[r("Mon"),d("Tue","easy",4,"4 mi easy",PG.easy),d("Wed","brand",5,"Brand pacing event","Speed workout ~ 5 mi total"),d("Thu","easy",4,"4 mi easy",PG.easy),r("Fri"),d("Sat","long",12,"12 mi long run",PG.long),r("Sun")]),
+  mk(3,2,"May 12","May 18",20,false,"vacation",[d("Mon","easy",4,"4 mi easy",PG.easy),d("Tue","easy",3,"3 mi easy - vacation",PG.easy),d("Wed","easy",3,"3 mi easy - vacation",PG.easy),r("Thu"),r("Fri"),d("Sat","long",10,"10 mi long run",PG.long),r("Sun")]),
+  mk(4,2,"May 19","May 25",22,false,"vacation-adjusted",[d("Mon","easy",3,"3 mi easy",PG.easy),d("Tue","intervals",5,"5 mi w/ 4x800m","800m @ 5:55 /mi - 400m jog recovery"),d("Wed","easy",3,"3 mi easy",PG.easy),d("Thu","easy",2,"2 mi easy",PG.easy),d("Fri","long",9,"9 mi long run - MOVED FROM SAT","Long run on Fri: Sat is no-run. "+PG.long),nr("Sat"),nr("Sun")]),
+  mk(5,2,"May 26","Jun 1",15,false,"adjusted",[nr("Mon"),nr("Tue"),d("Wed","easy",3,"3 mi easy - back to running",PG.easy),d("Thu","easy",4,"4 mi easy",PG.easy),r("Fri"),d("Sat","long",8,"8 mi long run - shorter after gap",PG.long),r("Sun")]),
+  mk(6,3,"Jun 2","Jun 8",26,false,"",[r("Mon"),d("Tue","intervals",6,"6 mi w/ 4x800m","800m @ 5:55 /mi - 400m jog recovery"),d("Wed","easy",4,"4 mi easy",PG.easy),d("Thu","easy",4,"4 mi easy",PG.easy),r("Fri"),d("Sat","long",12,"12 mi long run",PG.long),r("Sun")]),
+  mk(7,3,"Jun 9","Jun 15",29,false,"",[r("Mon"),d("Tue","intervals",7,"7 mi w/ 6x800m","800m @ 5:55 /mi - 400m jog recovery"),d("Wed","easy",5,"5 mi easy",PG.easy),d("Thu","tempo",6,"6 mi w/ 3 mi tempo","1.5mi WU - 3mi @ 6:45 /mi - 1.5mi CD"),r("Fri"),d("Sat","long",13,"13 mi long run",PG.long),r("Sun")]),
+  mk(8,3,"Jun 16","Jun 22",31,false,"",[r("Mon"),d("Tue","intervals",7,"7 mi w/ 6x800m","800m @ 5:50 /mi - 400m jog recovery"),d("Wed","easy",5,"5 mi easy",PG.easy),d("Thu","tempo",7,"7 mi w/ 3 mi tempo","1.5mi WU - 3mi @ 6:42 /mi - 1.5mi CD"),r("Fri"),d("Sat","long",13,"13 mi long run",PG.long),d("Sun","easy",2,"2 mi shakeout",PG.easy)]),
+  mk(9,3,"Jun 23","Jun 29",25,true,"",[r("Mon"),d("Tue","intervals",6,"6 mi w/ 4x800m","Recovery week - 800m @ 5:58 /mi"),d("Wed","easy",4,"4 mi easy",PG.easy),d("Thu","easy",4,"4 mi easy",PG.easy),r("Fri"),d("Sat","long",11,"11 mi long run",PG.long),r("Sun")]),
+  mk(10,3,"Jun 30","Jul 6",33,false,"",[r("Mon"),d("Tue","intervals",7,"7 mi w/ 6x800m","800m @ 5:50 /mi"),d("Wed","easy",5,"5 mi easy",PG.easy),d("Thu","tempo",7,"7 mi w/ 4 mi tempo","1.5mi WU - 4mi @ 6:42 /mi - 1.5mi CD"),r("Fri"),d("Sat","long",14,"14 mi long run",PG.long),r("Sun")]),
+  mk(11,3,"Jul 7","Jul 13",35,false,"",[d("Mon","easy",3,"3 mi easy",PG.easy),d("Tue","intervals",7,"7 mi w/ 8x800m","800m @ 5:50 /mi"),d("Wed","easy",5,"5 mi easy",PG.easy),d("Thu","tempo",7,"7 mi w/ 4 mi tempo","1.5mi WU - 4mi @ 6:40 /mi - 1.5mi CD"),r("Fri"),d("Sat","long",13,"13 mi long run",PG.long),r("Sun")]),
+  mk(12,3,"Jul 14","Jul 20",27,true,"",[r("Mon"),d("Tue","intervals",6,"6 mi w/ 4x800m","Recovery week - 800m @ 5:55 /mi"),d("Wed","easy",4,"4 mi easy",PG.easy),d("Thu","easy",4,"4 mi easy",PG.easy),r("Fri"),d("Sat","long",12,"12 mi long run",PG.long),d("Sun","easy",2,"2 mi shakeout",PG.easy)]),
+  mk(13,3,"Jul 21","Jul 27",38,false,"",[d("Mon","easy",3,"3 mi easy",PG.easy),d("Tue","intervals",8,"8 mi w/ 8x800m","800m @ 5:48 /mi"),d("Wed","easy",6,"6 mi easy",PG.easy),d("Thu","tempo",8,"8 mi w/ 5 mi tempo","1.5mi WU - 5mi @ 6:40 /mi - 1.5mi CD"),r("Fri"),d("Sat","long",15,"15 mi long run",PG.long),r("Sun")]),
+  mk(14,3,"Jul 28","Aug 3",40,false,"",[d("Mon","easy",3,"3 mi easy",PG.easy),d("Tue","intervals",8,"8 mi w/ 8x800m","800m @ 5:45 /mi"),d("Wed","easy",6,"6 mi easy",PG.easy),d("Thu","tempo",8,"8 mi w/ 5 mi tempo","1.5mi WU - 5mi @ 6:38 /mi - 1.5mi CD"),r("Fri"),d("Sat","long",15,"15 mi long run",PG.long),r("Sun")]),
+  mk(15,3,"Aug 4","Aug 9",31,true,"",[r("Mon"),d("Tue","intervals",6,"6 mi w/ 4x800m","Recovery week - 800m @ 5:52 /mi"),d("Wed","easy",5,"5 mi easy",PG.easy),d("Thu","tempo",6,"6 mi w/ 3 mi tempo","1.5mi WU - 3mi @ 6:42 /mi - 1.5mi CD"),r("Fri"),d("Sat","long",12,"12 mi long run",PG.long),r("Sun")]),
+  mk(16,4,"Aug 10","Aug 16",40,false,"",[d("Mon","easy",3,"3 mi easy",PG.easy),d("Tue","intervals",8,"8 mi w/ 8x800m","800m @ 5:45 /mi - peak intensity starts"),d("Wed","easy",6,"6 mi easy",PG.easy),d("Thu","hm",8,"8 mi w/ 4 mi @ HM pace","2mi WU - 4mi @ 7:07 /mi - 2mi CD"),r("Fri"),d("Sat","long",15,"15 mi long run",PG.long),r("Sun")]),
+  mk(17,4,"Aug 17","Aug 23",42,false,"",[d("Mon","easy",3,"3 mi easy",PG.easy),d("Tue","intervals",9,"9 mi w/ 10x800m","800m @ 5:45 /mi"),d("Wed","easy",7,"7 mi easy",PG.easy),d("Thu","hm",9,"9 mi w/ 5 mi @ HM pace","2mi WU - 5mi @ 7:07 /mi - 2mi CD"),r("Fri"),d("Sat","long",16,"16 mi long run - peak long run",PG.long),r("Sun")]),
+  mk(18,4,"Aug 24","Aug 30",33,false,"",[r("Mon"),d("Tue","intervals",7,"7 mi w/ 6x800m","Taper begins - 800m @ 5:48 /mi"),d("Wed","easy",5,"5 mi easy",PG.easy),d("Thu","tempo",7,"7 mi w/ 3 mi tempo","1.5mi WU - 3mi @ 6:42 /mi - 1.5mi CD"),r("Fri"),d("Sat","long",12,"12 mi easy long",PG.long),d("Sun","easy",2,"2 mi shakeout",PG.easy)]),
+  mk(19,4,"Aug 31","Sep 6",26,false,"",[r("Mon"),d("Tue","hm",6,"6 mi w/ 3 mi @ HM pace","1.5mi WU - 3mi @ 7:07 /mi - 1.5mi CD"),d("Wed","easy",5,"5 mi easy",PG.easy),d("Thu","easy",4,"4 mi easy",PG.easy),r("Fri"),d("Sat","long",10,"10 mi easy - last real long run",PG.long),d("Sun","easy",1,"1 mi shakeout",PG.easy)]),
+  mk(20,4,"Sep 7","Sep 13",20,false,"",[r("Mon"),d("Tue","strides",5,"5 mi w/ 6 strides","5 mi easy + 6x20-sec strides at 5K effort"),d("Wed","easy",4,"4 mi easy",PG.easy),d("Thu","easy",4,"4 mi easy",PG.easy),r("Fri"),d("Sat","long",7,"7 mi easy - fresh legs, no heroics",PG.easy),r("Sun")]),
+  mk(21,4,"Sep 14","Sep 20",22,false,"",[d("Mon","easy",3,"3 mi easy",PG.easy),d("Tue","easy",3,"3 mi easy",PG.easy),d("Wed","strides",3,"3 mi w/ 4 strides","Easy + 4x15-sec strides to wake up legs"),r("Thu"),r("Fri"),r("Sat"),d("Sun","race",13.1,"RACE - Copenhagen Half Marathon","Target: 7:07 /mi - Goal: sub-1:33:00")]),
+];
+
+let activePh = 1;
+const expanded = new Set();
+
+function badge(type) {
+  const t = TC[type];
+  return '<span class="day-badge" style="background:'+t.bg+';color:'+t.cl+';border:0.5px solid '+t.bd+'">'+t.lb+'</span>';
+}
+
+function renderWeeks() {
+  const ph = PHASES.find(p => p.id === activePh);
+  const phWeeks = WEEKS.filter(w => w.ph === activePh);
+  const banner = document.getElementById('phase-banner');
+  banner.style.background = ph.bg;
+  banner.style.borderLeft = '3px solid ' + ph.color;
+  banner.innerHTML = '<span style="font-weight:500;color:'+ph.color+'">'+ph.name+'</span><span>·</span><span>'+ph.dates+'</span><span>·</span><span>'+ph.desc+'</span>';
+
+  const container = document.getElementById('weeks-container');
+  container.innerHTML = '';
+  phWeeks.forEach(w => {
+    const isOpen = expanded.has(w.w);
+    const pct = Math.round((w.mi / 42) * 100);
+    const wDiv = document.createElement('div');
+    wDiv.className = 'week';
+
+    let tags = '';
+    if (w.cb) tags += '<span class="tag tag-recovery">Recovery</span>';
+    if (w.tag && w.tag.includes('vacation')) tags += '<span class="tag tag-vacation">Vacation</span>';
+    if (w.tag && w.tag.includes('adjusted')) tags += '<span class="tag tag-adjusted">Adjusted</span>';
+
+    let daysHtml = '';
+    if (isOpen) {
+      w.days.forEach((day, i) => {
+        const isRest = day.type === 'rest';
+        const isNoRun = day.type === 'norun';
+        daysHtml += '<div class="day-row" style="opacity:' + (isRest ? 0.45 : 1) + '">' +
+          '<span class="day-name">' + day.day + '</span>' +
+          badge(day.type) +
+          '<span class="day-desc" style="color:' + (isRest || isNoRun ? '#9ca3af' : '#111827') + '">' + day.desc + '</span>' +
+          (day.note && !isRest && !isNoRun ? '<span class="day-note">' + day.note + '</span>' : '') +
+          '</div>';
+      });
+    }
+
+    wDiv.innerHTML = '<div class="week-header" onclick="toggleWeek(' + w.w + ')">' +
+      '<span class="week-num">Week ' + w.w + '</span>' +
+      '<span class="week-dates">' + w.s + ' - ' + w.e + '</span>' +
+      tags +
+      '<span class="week-mi">' + w.mi + ' mi</span>' +
+      '<div class="week-bar-wrap"><div class="week-bar" style="width:' + pct + '%;background:' + ph.color + '"></div></div>' +
+      '<span class="chevron">' + (isOpen ? '▲' : '▼') + '</span>' +
+      '</div>' +
+      (isOpen ? '<div class="days-wrap" style="display:block">' + daysHtml + '</div>' : '<div class="days-wrap"></div>');
+    container.appendChild(wDiv);
+  });
+
+  document.querySelectorAll('.tab').forEach((tab, i) => {
+    tab.className = 'tab' + (PHASES[i].id === activePh ? ' active-' + activePh : '');
+  });
+}
+
+function setPhase(p) { activePh = p; expanded.clear(); renderWeeks(); }
+function toggleWeek(w) { if (expanded.has(w)) expanded.delete(w); else expanded.add(w); renderWeeks(); }
+
+renderWeeks();
+</script>
+</body>
+</html>
