@@ -91,9 +91,58 @@
   .pace-dot   { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
 
   @media (max-width: 620px) {
-    .cards { grid-template-columns: repeat(2,1fr); }
-    .day-note { display: none; }
-    .tab { min-width: 0; }
+    /* Tighter body padding */
+    body { padding: 1rem 0.875rem; }
+
+    /* Header */
+    .header-title { font-size: 20px; }
+    .header-sub   { font-size: 12px; margin-bottom: 1rem; }
+
+    /* Sync pill full width */
+    #sync-status { width: 100%; justify-content: center; margin-bottom: 1rem; }
+
+    /* 2x2 summary cards, smaller text */
+    .cards { grid-template-columns: repeat(2,1fr); gap: 8px; margin-bottom: 1rem; }
+    .card  { padding: 10px 12px; }
+    .card-value { font-size: 16px; }
+    .card-label, .card-sub { font-size: 11px; }
+
+    /* Global progress — stack score below title */
+    .global-progress { padding: 12px 14px; margin-bottom: 1rem; }
+    .gp-header { flex-direction: column; align-items: flex-start; gap: 4px; }
+    .gp-score  { font-size: 12px; }
+    .gp-legend { gap: 10px; }
+    .gp-leg    { font-size: 11px; }
+
+    /* Tabs: 2-per-row grid */
+    .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .tab  { min-width: 0; padding: 8px 10px; }
+    .tab-name { font-size: 12px; }
+    .tab-stat { font-size: 10px; }
+
+    /* Phase banner wrap nicely */
+    .phase-banner { font-size: 12px; padding: 8px 12px; gap: 5px; }
+
+    /* Week header: stack progress pill + mileage, hide mini bar */
+    .week-header  { padding: 10px 12px; gap: 6px; flex-wrap: wrap; }
+    .week-num     { font-size: 13px; min-width: 50px; }
+    .week-dates   { font-size: 12px; flex-basis: 100%; order: 2; color: #9ca3af; }
+    .week-mi      { font-size: 12px; padding: 2px 8px; order: 3; }
+    .week-bar-wrap { display: none; }
+    .chevron      { order: 4; margin-left: auto; }
+    .tag, .tag-progress { font-size: 10px; padding: 2px 6px; order: 3; }
+
+    /* Day rows: two-line layout */
+    .days-wrap { padding: 6px 12px 10px; }
+    .day-row   { flex-wrap: wrap; gap: 6px; padding: 8px 0; align-items: center; }
+    .day-name  { width: 24px; font-size: 12px; }
+    .day-badge { font-size: 10px; min-width: 62px; padding: 2px 6px; }
+    .day-desc  { font-size: 13px; flex: 1; min-width: 0; }
+    .day-note  { display: none; }
+
+    /* Bigger tap targets for buttons */
+    .day-actions { margin-left: auto; gap: 6px; }
+    .btn-act { width: 32px; height: 32px; font-size: 13px; }
   }
 </style>
 </head>
