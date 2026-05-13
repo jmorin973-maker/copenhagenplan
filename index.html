@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Copenhagen Half Marathon Training Plan</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: system-ui, -apple-system, sans-serif; background: #fff; color: #111827; padding: 1.5rem; max-width: 920px; margin: 0 auto; }
@@ -150,7 +149,7 @@
 
 <div class="header-label">Copenhagen Half Marathon · Training Plan</div>
 <div class="header-title">Sep 20, 2026</div>
-<div class="header-sub">21 weeks · 15–42 mi/week · Target: sub-1:33:00 · Starting Apr 28, 2026</div>
+<div class="header-sub">21 weeks · 15–42 mi/week · Target: 1:30:00 · Norwegian Singles Method</div>
 
 <div id="sync-status">
   <span id="sync-dot"></span>
@@ -159,7 +158,7 @@
 
 <div class="cards">
   <div class="card"><div class="card-label">Duration</div><div class="card-value">21 weeks</div><div class="card-sub">Apr 28 → Sep 20</div></div>
-  <div class="card"><div class="card-label">Target</div><div class="card-value">sub-1:33</div><div class="card-sub">~7:07 /mi goal pace</div></div>
+  <div class="card"><div class="card-label">Target</div><div class="card-value">1:30:00</div><div class="card-sub">6:52 /mi goal pace</div></div>
   <div class="card"><div class="card-label">Peak week</div><div class="card-value">42 mi</div><div class="card-sub">Week 17 · Aug 17</div></div>
   <div class="card"><div class="card-label">Peak long run</div><div class="card-value">16 mi</div><div class="card-sub">Week 17 · Aug 22</div></div>
 </div>
@@ -187,59 +186,80 @@
 <div class="pace-guide">
   <div class="pace-guide-label">Pace guide</div>
   <div class="pace-items">
-    <span class="pace-item"><span class="pace-dot" style="background:#f0fdf4;border:1px solid #86efac"></span><span style="color:#15803d;font-weight:500">Easy</span><span style="color:#6b7280">· 8:45–9:15 /mi</span></span>
-    <span class="pace-item"><span class="pace-dot" style="background:#eff6ff;border:1px solid #93c5fd"></span><span style="color:#1d4ed8;font-weight:500">Long run</span><span style="color:#6b7280">· 8:00–8:30 /mi</span></span>
-    <span class="pace-item"><span class="pace-dot" style="background:#fff7ed;border:1px solid #fdba74"></span><span style="color:#c2410c;font-weight:500">Threshold</span><span style="color:#6b7280">· 6:42–7:00 /mi · Norwegian Singles · short reps w/ 90-sec jog recovery</span></span>
-    <span class="pace-item"><span class="pace-dot" style="background:#fefce8;border:1px solid #fde047"></span><span style="color:#a16207;font-weight:500">HM pace</span><span style="color:#6b7280">· 7:05–7:10 /mi</span></span>
+    <span class="pace-item"><span class="pace-dot" style="background:#f0fdf4;border:1px solid #86efac"></span><span style="color:#15803d;font-weight:500">Easy</span><span style="color:#6b7280">· 8:20–8:50 /mi</span></span>
+    <span class="pace-item"><span class="pace-dot" style="background:#eff6ff;border:1px solid #93c5fd"></span><span style="color:#1d4ed8;font-weight:500">Long run</span><span style="color:#6b7280">· 7:45–8:15 /mi</span></span>
+    <span class="pace-item"><span class="pace-dot" style="background:#fff7ed;border:1px solid #fdba74"></span><span style="color:#c2410c;font-weight:500">Threshold</span><span style="color:#6b7280">· 6:28–6:45 /mi · Norwegian Singles · short reps w/ 90-sec jog recovery</span></span>
+    <span class="pace-item"><span class="pace-dot" style="background:#fefce8;border:1px solid #fde047"></span><span style="color:#a16207;font-weight:500">HM pace</span><span style="color:#6b7280">· 6:50–6:55 /mi</span></span>
     <span class="pace-item"><span class="pace-dot" style="background:#fff0f9;border:1px solid #f9a8d4"></span><span style="color:#be185d;font-weight:500">Brand event</span><span style="color:#6b7280">· quality session</span></span>
-    <span class="pace-item"><span class="pace-dot" style="background:#f5f3ff;border:1px solid #c4b5fd"></span><span style="color:#6d28d9;font-weight:500">Strides</span><span style="color:#6b7280">· 6:10–6:25 /mi</span></span>
+    <span class="pace-item"><span class="pace-dot" style="background:#f5f3ff;border:1px solid #c4b5fd"></span><span style="color:#6d28d9;font-weight:500">Strides</span><span style="color:#6b7280">· 5:55–6:10 /mi</span></span>
   </div>
 </div>
 
 <script>
-// ── Supabase ──────────────────────────────────────────────────────────────────
-const SUPA_URL  = 'https://bdjuazaxwdhcjmcnthll.supabase.co';
-const SUPA_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkanVhemF4d2RoY2ptY250aGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0ODkzMzQsImV4cCI6MjA5MzA2NTMzNH0.5Jyy4Fskd9_pdrGgNthz_-AQhcY3wITaq_GdrkKTV2I';
-const ROW_ID    = 'main';
-const TABLE     = 'training_progress';
-
-const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+// ── Supabase REST via XHR (Safari-safe) ─────────────────────────────────────
+const SUPA_URL = 'https://bdjuazaxwdhcjmcnthll.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkanVhemF4d2RoY2ptY250aGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0ODkzMzQsImV4cCI6MjA5MzA2NTMzNH0.5Jyy4Fskd9_pdrGgNthz_-AQhcY3wITaq_GdrkKTV2I';
+const TABLE    = 'training_progress';
+const ROW_ID   = 'main';
+const REST     = SUPA_URL + '/rest/v1/' + TABLE;
 
 function setSyncStatus(status, text) {
-  const dot  = document.getElementById('sync-dot');
-  const label = document.getElementById('sync-text');
-  dot.className = status;   // 'syncing' | 'synced' | 'error'
-  label.textContent = text;
+  document.getElementById('sync-dot').className    = status;
+  document.getElementById('sync-text').textContent = text;
 }
 
-// Debounced save
-let saveTimer = null;
-function scheduleSave() {
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(pushState, 800);
+function xhr(method, url, headers, body) {
+  return new Promise(function(resolve, reject) {
+    var req = new XMLHttpRequest();
+    req.open(method, url, true);
+    req.timeout = 10000;
+    Object.keys(headers).forEach(function(k) { req.setRequestHeader(k, headers[k]); });
+    req.onload = function() {
+      resolve({ ok: req.status >= 200 && req.status < 300, body: req.responseText });
+    };
+    req.onerror   = function() { reject(new Error('Network error')); };
+    req.ontimeout = function() { reject(new Error('Request timed out')); };
+    req.send(body || null);
+  });
 }
+
+let saveTimer = null;
+function scheduleSave() { clearTimeout(saveTimer); saveTimer = setTimeout(pushState, 800); }
 
 async function pushState() {
   setSyncStatus('syncing', 'Saving…');
-  const { error } = await supa.from(TABLE).upsert({ id: ROW_ID, state: S, updated_at: new Date().toISOString() });
-  if (error) {
+  try {
+    const res = await xhr('POST', REST, {
+      'apikey':        SUPA_KEY,
+      'Authorization': 'Bearer ' + SUPA_KEY,
+      'Content-Type':  'application/json',
+      'Prefer':        'resolution=merge-duplicates',
+    }, JSON.stringify({ id: ROW_ID, state: S, updated_at: new Date().toISOString() }));
+    if (!res.ok) throw new Error(res.body);
+    setSyncStatus('synced', 'Saved · ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+  } catch (err) {
     setSyncStatus('error', 'Save failed — check connection');
-    console.error(error);
-  } else {
-    setSyncStatus('synced', 'Saved · ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}));
+    console.error('pushState:', err.message);
   }
 }
 
-async function pullState() {
-  setSyncStatus('syncing', 'Loading…');
-  const { data, error } = await supa.from(TABLE).select('state').eq('id', ROW_ID).single();
-  if (error && error.code !== 'PGRST116') {   // PGRST116 = no rows, that's fine
-    setSyncStatus('error', 'Could not load — using local cache');
-    console.error(error);
-    try { S = JSON.parse(localStorage.getItem('cph2026v1')) || {}; } catch { S = {}; }
-  } else {
-    S = (data && data.state) ? data.state : {};
-    setSyncStatus('synced', 'Synced · ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}));
+async function pullState(attempt) {
+  attempt = attempt || 1;
+  setSyncStatus('syncing', attempt > 1 ? 'Retrying…' : 'Loading…');
+  try {
+    const res = await xhr('GET', REST + '?id=eq.' + ROW_ID + '&select=state&limit=1', {
+      'apikey':        SUPA_KEY,
+      'Authorization': 'Bearer ' + SUPA_KEY,
+    });
+    if (!res.ok) throw new Error(res.body);
+    const rows = JSON.parse(res.body);
+    S = (rows.length && rows[0].state) ? rows[0].state : {};
+    setSyncStatus('synced', 'Synced · ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+  } catch (err) {
+    if (attempt < 3) { setTimeout(function() { pullState(attempt + 1); }, 1500 * attempt); return; }
+    setSyncStatus('error', 'Offline — using local data');
+    console.error('pullState:', err.message);
+    try { S = JSON.parse(localStorage.getItem('cph2026v1')) || {}; } catch(e) { S = {}; }
   }
   render();
 }
@@ -263,7 +283,7 @@ const PHASES=[
   {id:3,name:"Build",     sub:"Wks 7–15", dates:"Jun 2 – Aug 9",  desc:"Norwegian Singles · Two threshold sessions/week (Tue + Thu) · Volume ramps to 40 mi.",color:"#c2410c",bg:"#fff7ed"},
   {id:4,name:"Taper",     sub:"Wks 16–21",dates:"Aug 10 – Sep 20",desc:"Peak threshold volume then steady taper. Race-pace work in final 3 weeks.",color:"#7c3aed",bg:"#f5f3ff"},
 ];
-const PG={easy:"8:45–9:15 /mi",long:"8:00–8:30 /mi",tempo:"6:42–7:00 /mi",hm:"7:05–7:10 /mi",strides:"6:10–6:25 /mi"};
+const PG={easy:"8:20–8:50 /mi",long:"7:45–8:15 /mi",tempo:"6:28–6:45 /mi",hm:"6:50–6:55 /mi",strides:"5:55–6:10 /mi"};
 const mk=(w,ph,s,e,mi,cb,tag,days)=>({w,ph,s,e,mi,cb,tag,days});
 const dw=(day,type,mi,desc,note)=>({day,type,mi,desc,note:note||""});
 const rest=day=>dw(day,"rest",0,"Rest","");
@@ -272,29 +292,29 @@ const WEEKS=[
   // ── Week 1 unchanged (current week) ──────────────────────────────────────────
   mk(1,1,"Apr 28","May 4",24,false,"",[rest("Mon"),dw("Tue","easy",4,"4 mi easy",PG.easy),dw("Wed","brand",5,"Brand pacing event","Quality session ~ 5 mi total"),dw("Thu","easy",4,"4 mi easy",PG.easy),rest("Fri"),dw("Sat","long",11,"11 mi long run",PG.long),rest("Sun")]),
   // ── Norwegian Singles begins ──────────────────────────────────────────────────
-  mk(2,1,"May 5","May 11",25,false,"",[rest("Mon"),dw("Tue","tempo",5,"5 mi w/ 4×5 min threshold","4×5min @ 6:58 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","brand",5,"Brand pacing event","2nd quality session this week"),dw("Thu","easy",4,"4 mi easy",PG.easy),rest("Fri"),dw("Sat","long",11,"11 mi long run",PG.long),rest("Sun")]),
-  mk(3,2,"May 12","May 18",20,false,"vacation",[dw("Mon","easy",4,"4 mi easy",PG.easy),dw("Tue","tempo",5,"5 mi w/ 4×5 min threshold","4×5min @ 6:58 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",3,"3 mi easy – vacation",PG.easy),rest("Thu"),rest("Fri"),dw("Sat","long",10,"10 mi long run",PG.long),rest("Sun")]),
-  mk(4,2,"May 19","May 25",22,false,"vacation-adjusted",[dw("Mon","easy",3,"3 mi easy",PG.easy),dw("Tue","tempo",5,"5 mi w/ 4×6 min threshold","4×6min @ 6:55 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",3,"3 mi easy",PG.easy),dw("Thu","easy",2,"2 mi easy",PG.easy),dw("Fri","long",9,"9 mi long run – MOVED FROM SAT","Long run on Fri · Sat is no-run · "+PG.long),norun("Sat"),norun("Sun")]),
+  mk(2,1,"May 5","May 11",25,false,"",[rest("Mon"),dw("Tue","tempo",5,"5 mi w/ 4×5 min threshold","4×5min @ 6:43 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","brand",5,"Brand pacing event","2nd quality session this week"),dw("Thu","easy",4,"4 mi easy",PG.easy),rest("Fri"),dw("Sat","long",11,"11 mi long run",PG.long),rest("Sun")]),
+  mk(3,2,"May 12","May 18",20,false,"vacation",[dw("Mon","easy",4,"4 mi easy",PG.easy),dw("Tue","tempo",5,"5 mi w/ 4×5 min threshold","4×5min @ 6:43 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",3,"3 mi easy – vacation",PG.easy),rest("Thu"),rest("Fri"),dw("Sat","long",10,"10 mi long run",PG.long),rest("Sun")]),
+  mk(4,2,"May 19","May 25",22,false,"vacation-adjusted",[dw("Mon","easy",3,"3 mi easy",PG.easy),dw("Tue","tempo",5,"5 mi w/ 4×6 min threshold","4×6min @ 6:40 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",3,"3 mi easy",PG.easy),dw("Thu","easy",2,"2 mi easy",PG.easy),dw("Fri","long",9,"9 mi long run – MOVED FROM SAT","Long run on Fri · Sat is no-run · "+PG.long),norun("Sat"),norun("Sun")]),
   mk(5,2,"May 26","Jun 1",15,false,"adjusted",[norun("Mon"),norun("Tue"),dw("Wed","easy",3,"3 mi easy – back to running",PG.easy),dw("Thu","easy",4,"4 mi easy",PG.easy),rest("Fri"),dw("Sat","long",8,"8 mi long run – shorter after gap",PG.long),rest("Sun")]),
   // ── First full Norwegian Singles double-threshold week ────────────────────────
-  mk(6,3,"Jun 2","Jun 8",26,false,"",[rest("Mon"),dw("Tue","tempo",6,"6 mi w/ 5×6 min threshold","5×6min @ 6:53 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",4,"4 mi easy",PG.easy),dw("Thu","tempo",6,"6 mi w/ 4×6 min threshold","4×6min @ 6:53 /mi · 90-sec jog · Norwegian Singles"),rest("Fri"),dw("Sat","long",12,"12 mi long run",PG.long),rest("Sun")]),
-  mk(7,3,"Jun 9","Jun 15",29,false,"",[rest("Mon"),dw("Tue","tempo",7,"7 mi w/ 5×6 min threshold","5×6min @ 6:52 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",5,"5 mi easy",PG.easy),dw("Thu","tempo",6,"6 mi w/ 4×8 min threshold","4×8min @ 6:52 /mi · 90-sec jog · Norwegian Singles"),rest("Fri"),dw("Sat","long",13,"13 mi long run",PG.long),rest("Sun")]),
-  mk(8,3,"Jun 16","Jun 22",31,false,"",[rest("Mon"),dw("Tue","tempo",7,"7 mi w/ 5×7 min threshold","5×7min @ 6:50 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",5,"5 mi easy",PG.easy),dw("Thu","tempo",7,"7 mi w/ 4×8 min threshold","4×8min @ 6:50 /mi · 90-sec jog · Norwegian Singles"),rest("Fri"),dw("Sat","long",13,"13 mi long run",PG.long),dw("Sun","easy",2,"2 mi shakeout",PG.easy)]),
-  mk(9,3,"Jun 23","Jun 29",25,true,"",[rest("Mon"),dw("Tue","tempo",6,"6 mi w/ 4×6 min threshold","Recovery wk · 4×6min @ 6:53 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",4,"4 mi easy",PG.easy),dw("Thu","easy",4,"4 mi easy",PG.easy),rest("Fri"),dw("Sat","long",11,"11 mi long run",PG.long),rest("Sun")]),
-  mk(10,3,"Jun 30","Jul 6",33,false,"",[rest("Mon"),dw("Tue","tempo",7,"7 mi w/ 5×8 min threshold","5×8min @ 6:48 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",5,"5 mi easy",PG.easy),dw("Thu","tempo",7,"7 mi w/ 3×10 min threshold","3×10min @ 6:48 /mi · 2-min jog · Norwegian Singles"),rest("Fri"),dw("Sat","long",14,"14 mi long run",PG.long),rest("Sun")]),
-  mk(11,3,"Jul 7","Jul 13",35,false,"",[dw("Mon","easy",3,"3 mi easy",PG.easy),dw("Tue","tempo",7,"7 mi w/ 5×8 min threshold","5×8min @ 6:48 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",5,"5 mi easy",PG.easy),dw("Thu","tempo",7,"7 mi w/ 3×10 min threshold","3×10min @ 6:47 /mi · 2-min jog · Norwegian Singles"),rest("Fri"),dw("Sat","long",13,"13 mi long run",PG.long),rest("Sun")]),
-  mk(12,3,"Jul 14","Jul 20",27,true,"",[rest("Mon"),dw("Tue","tempo",6,"6 mi w/ 4×7 min threshold","Recovery wk · 4×7min @ 6:50 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",4,"4 mi easy",PG.easy),dw("Thu","easy",4,"4 mi easy",PG.easy),rest("Fri"),dw("Sat","long",12,"12 mi long run",PG.long),dw("Sun","easy",2,"2 mi shakeout",PG.easy)]),
-  mk(13,3,"Jul 21","Jul 27",38,false,"",[dw("Mon","easy",3,"3 mi easy",PG.easy),dw("Tue","tempo",8,"8 mi w/ 4×10 min threshold","4×10min @ 6:47 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",6,"6 mi easy",PG.easy),dw("Thu","tempo",8,"8 mi w/ 3×12 min threshold","3×12min @ 6:47 /mi · 2-min jog · Norwegian Singles"),rest("Fri"),dw("Sat","long",15,"15 mi long run",PG.long),rest("Sun")]),
-  mk(14,3,"Jul 28","Aug 3",40,false,"",[dw("Mon","easy",3,"3 mi easy",PG.easy),dw("Tue","tempo",8,"8 mi w/ 4×10 min threshold","4×10min @ 6:45 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",6,"6 mi easy",PG.easy),dw("Thu","tempo",8,"8 mi w/ 3×12 min threshold","3×12min @ 6:45 /mi · 2-min jog · Norwegian Singles"),rest("Fri"),dw("Sat","long",15,"15 mi long run",PG.long),rest("Sun")]),
-  mk(15,3,"Aug 4","Aug 9",31,true,"",[rest("Mon"),dw("Tue","tempo",6,"6 mi w/ 4×8 min threshold","Recovery wk · 4×8min @ 6:48 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",5,"5 mi easy",PG.easy),dw("Thu","easy",6,"6 mi easy",PG.easy),rest("Fri"),dw("Sat","long",12,"12 mi long run",PG.long),rest("Sun")]),
+  mk(6,3,"Jun 2","Jun 8",26,false,"",[rest("Mon"),dw("Tue","tempo",6,"6 mi w/ 5×6 min threshold","5×6min @ 6:38 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",4,"4 mi easy",PG.easy),dw("Thu","tempo",6,"6 mi w/ 4×6 min threshold","4×6min @ 6:38 /mi · 90-sec jog · Norwegian Singles"),rest("Fri"),dw("Sat","long",12,"12 mi long run",PG.long),rest("Sun")]),
+  mk(7,3,"Jun 9","Jun 15",29,false,"",[rest("Mon"),dw("Tue","tempo",7,"7 mi w/ 5×6 min threshold","5×6min @ 6:37 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",5,"5 mi easy",PG.easy),dw("Thu","tempo",6,"6 mi w/ 4×8 min threshold","4×8min @ 6:37 /mi · 90-sec jog · Norwegian Singles"),rest("Fri"),dw("Sat","long",13,"13 mi long run",PG.long),rest("Sun")]),
+  mk(8,3,"Jun 16","Jun 22",31,false,"",[rest("Mon"),dw("Tue","tempo",7,"7 mi w/ 5×7 min threshold","5×7min @ 6:35 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",5,"5 mi easy",PG.easy),dw("Thu","tempo",7,"7 mi w/ 4×8 min threshold","4×8min @ 6:35 /mi · 90-sec jog · Norwegian Singles"),rest("Fri"),dw("Sat","long",13,"13 mi long run",PG.long),dw("Sun","easy",2,"2 mi shakeout",PG.easy)]),
+  mk(9,3,"Jun 23","Jun 29",25,true,"",[rest("Mon"),dw("Tue","tempo",6,"6 mi w/ 4×6 min threshold","Recovery wk · 4×6min @ 6:38 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",4,"4 mi easy",PG.easy),dw("Thu","easy",4,"4 mi easy",PG.easy),rest("Fri"),dw("Sat","long",11,"11 mi long run",PG.long),rest("Sun")]),
+  mk(10,3,"Jun 30","Jul 6",33,false,"",[rest("Mon"),dw("Tue","tempo",7,"7 mi w/ 5×8 min threshold","5×8min @ 6:33 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",5,"5 mi easy",PG.easy),dw("Thu","tempo",7,"7 mi w/ 3×10 min threshold","3×10min @ 6:33 /mi · 2-min jog · Norwegian Singles"),rest("Fri"),dw("Sat","long",14,"14 mi long run",PG.long),rest("Sun")]),
+  mk(11,3,"Jul 7","Jul 13",35,false,"",[dw("Mon","easy",3,"3 mi easy",PG.easy),dw("Tue","tempo",7,"7 mi w/ 5×8 min threshold","5×8min @ 6:33 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",5,"5 mi easy",PG.easy),dw("Thu","tempo",7,"7 mi w/ 3×10 min threshold","3×10min @ 6:32 /mi · 2-min jog · Norwegian Singles"),rest("Fri"),dw("Sat","long",13,"13 mi long run",PG.long),rest("Sun")]),
+  mk(12,3,"Jul 14","Jul 20",27,true,"",[rest("Mon"),dw("Tue","tempo",6,"6 mi w/ 4×7 min threshold","Recovery wk · 4×7min @ 6:35 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",4,"4 mi easy",PG.easy),dw("Thu","easy",4,"4 mi easy",PG.easy),rest("Fri"),dw("Sat","long",12,"12 mi long run",PG.long),dw("Sun","easy",2,"2 mi shakeout",PG.easy)]),
+  mk(13,3,"Jul 21","Jul 27",38,false,"",[dw("Mon","easy",3,"3 mi easy",PG.easy),dw("Tue","tempo",8,"8 mi w/ 4×10 min threshold","4×10min @ 6:32 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",6,"6 mi easy",PG.easy),dw("Thu","tempo",8,"8 mi w/ 3×12 min threshold","3×12min @ 6:32 /mi · 2-min jog · Norwegian Singles"),rest("Fri"),dw("Sat","long",15,"15 mi long run",PG.long),rest("Sun")]),
+  mk(14,3,"Jul 28","Aug 3",40,false,"",[dw("Mon","easy",3,"3 mi easy",PG.easy),dw("Tue","tempo",8,"8 mi w/ 4×10 min threshold","4×10min @ 6:30 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",6,"6 mi easy",PG.easy),dw("Thu","tempo",8,"8 mi w/ 3×12 min threshold","3×12min @ 6:30 /mi · 2-min jog · Norwegian Singles"),rest("Fri"),dw("Sat","long",15,"15 mi long run",PG.long),rest("Sun")]),
+  mk(15,3,"Aug 4","Aug 9",31,true,"",[rest("Mon"),dw("Tue","tempo",6,"6 mi w/ 4×8 min threshold","Recovery wk · 4×8min @ 6:33 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",5,"5 mi easy",PG.easy),dw("Thu","easy",6,"6 mi easy",PG.easy),rest("Fri"),dw("Sat","long",12,"12 mi long run",PG.long),rest("Sun")]),
   // ── Peak threshold volume ─────────────────────────────────────────────────────
-  mk(16,4,"Aug 10","Aug 16",40,false,"",[dw("Mon","easy",3,"3 mi easy",PG.easy),dw("Tue","tempo",8,"8 mi w/ 4×10 min threshold","4×10min @ 6:43 /mi · 90-sec jog · Norwegian Singles – peak intensity"),dw("Wed","easy",6,"6 mi easy",PG.easy),dw("Thu","tempo",8,"8 mi w/ 3×15 min threshold","3×15min @ 6:43 /mi · 2-min jog · Norwegian Singles"),rest("Fri"),dw("Sat","long",15,"15 mi long run",PG.long),rest("Sun")]),
-  mk(17,4,"Aug 17","Aug 23",42,false,"",[dw("Mon","easy",3,"3 mi easy",PG.easy),dw("Tue","tempo",9,"9 mi w/ 4×10 min threshold","4×10min @ 6:42 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",7,"7 mi easy",PG.easy),dw("Thu","tempo",9,"9 mi w/ 3×15 min threshold","3×15min @ 6:42 /mi · 2-min jog · Norwegian Singles – peak long threshold"),rest("Fri"),dw("Sat","long",16,"16 mi long run – peak long run",PG.long),rest("Sun")]),
+  mk(16,4,"Aug 10","Aug 16",40,false,"",[dw("Mon","easy",3,"3 mi easy",PG.easy),dw("Tue","tempo",8,"8 mi w/ 4×10 min threshold","4×10min @ 6:28 /mi · 90-sec jog · Norwegian Singles – peak intensity"),dw("Wed","easy",6,"6 mi easy",PG.easy),dw("Thu","tempo",8,"8 mi w/ 3×15 min threshold","3×15min @ 6:28 /mi · 2-min jog · Norwegian Singles"),rest("Fri"),dw("Sat","long",15,"15 mi long run",PG.long),rest("Sun")]),
+  mk(17,4,"Aug 17","Aug 23",42,false,"",[dw("Mon","easy",3,"3 mi easy",PG.easy),dw("Tue","tempo",9,"9 mi w/ 4×10 min threshold","4×10min @ 6:27 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",7,"7 mi easy",PG.easy),dw("Thu","tempo",9,"9 mi w/ 3×15 min threshold","3×15min @ 6:27 /mi · 2-min jog · Norwegian Singles – peak long threshold"),rest("Fri"),dw("Sat","long",16,"16 mi long run – peak long run",PG.long),rest("Sun")]),
   // ── Taper ─────────────────────────────────────────────────────────────────────
-  mk(18,4,"Aug 24","Aug 30",33,false,"",[rest("Mon"),dw("Tue","tempo",7,"7 mi w/ 4×8 min threshold","Taper · 4×8min @ 6:45 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",5,"5 mi easy",PG.easy),dw("Thu","tempo",7,"7 mi w/ 3×10 min threshold","3×10min @ 6:45 /mi · 2-min jog · Norwegian Singles"),rest("Fri"),dw("Sat","long",12,"12 mi easy long",PG.long),dw("Sun","easy",2,"2 mi shakeout",PG.easy)]),
-  mk(19,4,"Aug 31","Sep 6",26,false,"",[rest("Mon"),dw("Tue","hm",6,"6 mi w/ 3×8 min @ HM pace","Transition to race pace · 3×8min @ 7:07 /mi · 2-min jog"),dw("Wed","easy",5,"5 mi easy",PG.easy),dw("Thu","easy",4,"4 mi easy",PG.easy),rest("Fri"),dw("Sat","long",10,"10 mi easy – last real long run",PG.long),dw("Sun","easy",1,"1 mi shakeout",PG.easy)]),
-  mk(20,4,"Sep 7","Sep 13",20,false,"",[rest("Mon"),dw("Tue","hm",5,"5 mi w/ 2×8 min @ HM pace + strides","2×8min @ 7:07 /mi · 4×20-sec strides"),dw("Wed","easy",4,"4 mi easy",PG.easy),dw("Thu","easy",4,"4 mi easy",PG.easy),rest("Fri"),dw("Sat","long",7,"7 mi easy – fresh legs, no heroics",PG.easy),rest("Sun")]),
-  mk(21,4,"Sep 14","Sep 20",22,false,"",[dw("Mon","easy",3,"3 mi easy",PG.easy),dw("Tue","easy",3,"3 mi easy",PG.easy),dw("Wed","strides",3,"3 mi w/ 2×3 min @ HM pace + strides","2×3min @ 7:07 /mi · 4×15-sec strides"),rest("Thu"),rest("Fri"),rest("Sat"),dw("Sun","race",13.1,"RACE – Copenhagen Half Marathon","Target: 7:07 /mi · Goal: sub-1:33:00")]),
+  mk(18,4,"Aug 24","Aug 30",33,false,"",[rest("Mon"),dw("Tue","tempo",7,"7 mi w/ 4×8 min threshold","Taper · 4×8min @ 6:30 /mi · 90-sec jog · Norwegian Singles"),dw("Wed","easy",5,"5 mi easy",PG.easy),dw("Thu","tempo",7,"7 mi w/ 3×10 min threshold","3×10min @ 6:30 /mi · 2-min jog · Norwegian Singles"),rest("Fri"),dw("Sat","long",12,"12 mi easy long",PG.long),dw("Sun","easy",2,"2 mi shakeout",PG.easy)]),
+  mk(19,4,"Aug 31","Sep 6",26,false,"",[rest("Mon"),dw("Tue","hm",6,"6 mi w/ 3×8 min @ HM pace","Transition to race pace · 3×8min @ 6:52 /mi · 2-min jog"),dw("Wed","easy",5,"5 mi easy",PG.easy),dw("Thu","easy",4,"4 mi easy",PG.easy),rest("Fri"),dw("Sat","long",10,"10 mi easy – last real long run",PG.long),dw("Sun","easy",1,"1 mi shakeout",PG.easy)]),
+  mk(20,4,"Sep 7","Sep 13",20,false,"",[rest("Mon"),dw("Tue","hm",5,"5 mi w/ 2×8 min @ HM pace + strides","2×8min @ 6:52 /mi · 4×20-sec strides"),dw("Wed","easy",4,"4 mi easy",PG.easy),dw("Thu","easy",4,"4 mi easy",PG.easy),rest("Fri"),dw("Sat","long",7,"7 mi easy – fresh legs, no heroics",PG.easy),rest("Sun")]),
+  mk(21,4,"Sep 14","Sep 20",22,false,"",[dw("Mon","easy",3,"3 mi easy",PG.easy),dw("Tue","easy",3,"3 mi easy",PG.easy),dw("Wed","strides",3,"3 mi w/ 2×3 min @ HM pace + strides","2×3min @ 6:52 /mi · 4×15-sec strides"),rest("Thu"),rest("Fri"),rest("Sat"),dw("Sun","race",13.1,"RACE – Copenhagen Half Marathon","Target: 6:52 /mi · Goal: 1:30:00")]),
 ];
 
 // ── State ─────────────────────────────────────────────────────────────────────
@@ -454,7 +474,38 @@ function render() {
 }
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
-render(); // initial render with empty state while loading
+function getCurrentPhase() {
+  const now = new Date();
+  const m = now.getMonth() + 1, d = now.getDate(), y = now.getFullYear();
+  if (y !== 2026) return 1;
+  if (m < 5 || (m === 5 && d <= 11)) return 1;
+  if (m === 5 || (m === 6 && d <= 1)) return 2;
+  if ((m === 6 && d >= 2) || m === 7 || (m === 8 && d <= 9)) return 3;
+  return 4;
+}
+
+function getCurrentWeek() {
+  const now = new Date();
+  const MONTHS = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+  function parseWeekDate(str) {
+    // str is like "Apr 28" or "May 4"
+    const parts = str.trim().split(' ');
+    return new Date(2026, MONTHS[parts[0]], parseInt(parts[1], 10));
+  }
+  for (const w of WEEKS) {
+    const start = parseWeekDate(w.s);
+    const end   = parseWeekDate(w.e);
+    end.setHours(23, 59, 59, 999);
+    if (now >= start && now <= end) return w.w;
+  }
+  return null;
+}
+
+activePhase = getCurrentPhase();
+const currentWeekNum = getCurrentWeek();
+if (currentWeekNum !== null) open.add(currentWeekNum);
+
+render();
 pullState();
 </script>
 </body>
